@@ -60,9 +60,11 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
               <i className="fas fa-bell"></i>
               <span className="hidden md:block">Alertas</span>
             </Button>
-            <Button className="bg-primary-purple text-white hover:bg-primary-purple font-medium">
-              Postar
-            </Button>
+            <Link href="/postar">
+              <Button className="bg-primary-purple text-white hover:bg-primary-purple font-medium">
+                Postar
+              </Button>
+            </Link>
           </div>
         </div>
 

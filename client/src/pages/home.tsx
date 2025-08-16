@@ -4,6 +4,7 @@ import Header from "@/components/header";
 import CategoryTabs from "@/components/category-tabs";
 import PostCard from "@/components/post-card";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { useState } from "react";
 
 export default function Home() {
@@ -39,9 +40,11 @@ export default function Home() {
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-4">ServiçoHub - Seu Marketplace Completo</h2>
                   <p className="text-xl mb-4">Serviços, Produtos, Notícias e Vagas em um só lugar</p>
-                  <Button className="bg-white text-primary-purple hover:bg-gray-100 font-semibold">
-                    Postar Anúncio
-                  </Button>
+                  <Link href="/postar">
+                    <Button className="bg-white text-primary-purple hover:bg-gray-100 font-semibold">
+                      Postar Anúncio
+                    </Button>
+                  </Link>
                 </div>
                 <div className="flex-1 text-right">
                   <img 

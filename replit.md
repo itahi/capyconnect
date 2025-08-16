@@ -14,10 +14,10 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: React 18 with TypeScript for type safety
 - **Build Tool**: Vite for fast development and optimized production builds
 - **UI Framework**: Radix UI components with shadcn/ui design system
-- **Styling**: Tailwind CSS with custom Brazilian-themed color scheme (green, blue, yellow)
-- **Routing**: Wouter for lightweight client-side routing
+- **Styling**: Tailwind CSS with purple marketplace color scheme
+- **Routing**: Wouter for lightweight client-side routing with post creation page
 - **State Management**: TanStack Query for server state management and caching
-- **Forms**: React Hook Form with Zod validation for form handling
+- **Forms**: React Hook Form with Zod validation for comprehensive post creation forms
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
@@ -51,9 +51,10 @@ Preferred communication style: Simple, everyday language.
 
 ### API Structure
 - **Categories**: CRUD operations for marketplace categories (services, products, news, jobs)
-- **Posts**: Post management for services, products, news, and job listings
+- **Posts**: Full CRUD operations for services, products, news, and job listings with creation form
 - **Users**: User management with contact information and WhatsApp integration
 - **Contact Tracking**: Analytics for WhatsApp redirects and link clicks
+- **Post Creation**: Complete form system for users to add services, products, jobs, and news
 
 ## External Dependencies
 
