@@ -1,229 +1,215 @@
 import { 
-  type Category, type Store, type Deal, type Coupon,
-  type InsertCategory, type InsertStore, type InsertDeal, type InsertCoupon,
-  type DealWithRelations, type CouponWithStore
+  type Category, type User, type Post,
+  type InsertCategory, type InsertUser, type InsertPost,
+  type PostWithRelations
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
   // Categories
-  getCategories(): Promise<Category[]>;
+  getCategories(type?: string): Promise<Category[]>;
   getCategoryBySlug(slug: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
 
-  // Stores
-  getStores(): Promise<Store[]>;
-  getStoreById(id: string): Promise<Store | undefined>;
-  createStore(store: InsertStore): Promise<Store>;
+  // Users
+  getUsers(): Promise<User[]>;
+  getUserById(id: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
 
-  // Deals
-  getDeals(options?: {
+  // Posts
+  getPosts(options?: {
     categoryId?: string;
-    storeId?: string;
-    isHot?: boolean;
+    type?: string;
+    isFeatured?: boolean;
     limit?: number;
     search?: string;
-  }): Promise<DealWithRelations[]>;
-  getDealById(id: string): Promise<DealWithRelations | undefined>;
-  createDeal(deal: InsertDeal): Promise<Deal>;
-  incrementDealUsage(id: string): Promise<void>;
-
-  // Coupons
-  getCoupons(options?: {
-    storeId?: string;
-    isActive?: boolean;
-    limit?: number;
-  }): Promise<CouponWithStore[]>;
-  getCouponById(id: string): Promise<CouponWithStore | undefined>;
-  createCoupon(coupon: InsertCoupon): Promise<Coupon>;
-  incrementCouponUsage(id: string): Promise<void>;
+    location?: string;
+  }): Promise<PostWithRelations[]>;
+  getPostById(id: string): Promise<PostWithRelations | undefined>;
+  createPost(post: InsertPost): Promise<Post>;
+  incrementPostView(id: string): Promise<void>;
+  incrementPostContact(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
   private categories: Map<string, Category> = new Map();
-  private stores: Map<string, Store> = new Map();
-  private deals: Map<string, Deal> = new Map();
-  private coupons: Map<string, Coupon> = new Map();
+  private users: Map<string, User> = new Map();
+  private posts: Map<string, Post> = new Map();
 
   constructor() {
     this.seedData();
   }
 
   private seedData() {
-    // Seed categories
+    // Seed categories by type
     const categoryData = [
-      { name: "Smartphones", slug: "smartphones", icon: "fas fa-mobile-alt" },
-      { name: "Eletrônicos", slug: "eletronicos", icon: "fas fa-laptop" },
-      { name: "Casa e Jardim", slug: "casa-jardim", icon: "fas fa-home" },
-      { name: "Moda", slug: "moda", icon: "fas fa-tshirt" },
-      { name: "Games", slug: "games", icon: "fas fa-gamepad" },
-      { name: "Saúde e Beleza", slug: "saude-beleza", icon: "fas fa-heart" },
-      { name: "Esportes", slug: "esportes", icon: "fas fa-dumbbell" },
-      { name: "Viagens", slug: "viagens", icon: "fas fa-plane" },
+      // Services
+      { name: "Limpeza", slug: "limpeza", icon: "fas fa-broom", type: "service" },
+      { name: "Encanamento", slug: "encanamento", icon: "fas fa-wrench", type: "service" },
+      { name: "Elétrica", slug: "eletrica", icon: "fas fa-bolt", type: "service" },
+      { name: "Jardinagem", slug: "jardinagem", icon: "fas fa-leaf", type: "service" },
+      { name: "Pintura", slug: "pintura", icon: "fas fa-paint-roller", type: "service" },
+      
+      // Products
+      { name: "Eletrônicos", slug: "eletronicos", icon: "fas fa-laptop", type: "product" },
+      { name: "Móveis", slug: "moveis", icon: "fas fa-chair", type: "product" },
+      { name: "Roupas", slug: "roupas", icon: "fas fa-tshirt", type: "product" },
+      { name: "Casa", slug: "casa", icon: "fas fa-home", type: "product" },
+      
+      // Jobs
+      { name: "Tecnologia", slug: "tecnologia", icon: "fas fa-code", type: "job" },
+      { name: "Vendas", slug: "vendas", icon: "fas fa-handshake", type: "job" },
+      { name: "Administração", slug: "administracao", icon: "fas fa-briefcase", type: "job" },
+      { name: "Saúde", slug: "saude", icon: "fas fa-heartbeat", type: "job" },
+      
+      // News
+      { name: "Economia", slug: "economia", icon: "fas fa-chart-line", type: "news" },
+      { name: "Negócios", slug: "negocios", icon: "fas fa-building", type: "news" },
+      { name: "Tecnologia", slug: "tech-news", icon: "fas fa-microchip", type: "news" },
     ];
 
     categoryData.forEach(cat => {
       const id = randomUUID();
-      this.categories.set(id, { id, ...cat, dealCount: 0 });
+      this.categories.set(id, { id, ...cat, postCount: 0 });
     });
 
-    // Seed stores
-    const storeData = [
-      { name: "Amazon", slug: "amazon", logoUrl: "https://logo.clearbit.com/amazon.com.br", websiteUrl: "https://amazon.com.br", isVerified: true },
-      { name: "Magazine Luiza", slug: "magazine-luiza", logoUrl: "https://logo.clearbit.com/magazineluiza.com.br", websiteUrl: "https://magazineluiza.com.br", isVerified: true },
-      { name: "Americanas", slug: "americanas", logoUrl: "https://logo.clearbit.com/americanas.com.br", websiteUrl: "https://americanas.com.br", isVerified: true },
-      { name: "Casas Bahia", slug: "casas-bahia", logoUrl: "https://logo.clearbit.com/casasbahia.com.br", websiteUrl: "https://casasbahia.com.br", isVerified: true },
-      { name: "Nike", slug: "nike", logoUrl: "https://logo.clearbit.com/nike.com", websiteUrl: "https://nike.com.br", isVerified: true },
-      { name: "Dell", slug: "dell", logoUrl: "https://logo.clearbit.com/dell.com", websiteUrl: "https://dell.com.br", isVerified: true },
+    // Seed users
+    const userData = [
+      { name: "João Silva", email: "joao@email.com", phone: "(11) 99999-0001", whatsapp: "11999990001", location: "São Paulo - SP", isVerified: true },
+      { name: "Maria Santos", email: "maria@email.com", phone: "(21) 99999-0002", whatsapp: "21999990002", location: "Rio de Janeiro - RJ", isVerified: true },
+      { name: "Pedro Lima", email: "pedro@email.com", phone: "(31) 99999-0003", whatsapp: "31999990003", location: "Belo Horizonte - MG", isVerified: false },
+      { name: "Ana Costa", email: "ana@email.com", phone: "(85) 99999-0004", whatsapp: "85999990004", location: "Fortaleza - CE", isVerified: true },
     ];
 
-    storeData.forEach(store => {
+    userData.forEach(user => {
       const id = randomUUID();
-      this.stores.set(id, { id, ...store });
+      this.users.set(id, { 
+        id, 
+        name: user.name,
+        email: user.email || null,
+        phone: user.phone || null,
+        whatsapp: user.whatsapp || null,
+        location: user.location || null,
+        isVerified: user.isVerified || false,
+        createdAt: new Date()
+      });
     });
 
-    // Get some IDs for seeding deals
+    // Get some IDs for seeding posts
     const categoryIds = Array.from(this.categories.keys());
-    const storeIds = Array.from(this.stores.keys());
+    const userIds = Array.from(this.users.keys());
 
-    // Seed deals
-    const dealData = [
+    // Seed posts
+    const postData = [
       {
-        title: "iPhone 14 Pro Max 256GB",
-        description: "O mais novo iPhone com câmera profissional e tela Super Retina XDR",
-        imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 1199900, // R$ 11,999.00
-        salePrice: 419900, // R$ 4,199.00
-        discountPercentage: 65,
-        dealUrl: "https://amazon.com.br/iphone-14-pro-max",
-        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
-        isHot: true,
-        categoryId: categoryIds[0], // Smartphones
-        storeId: storeIds[0], // Amazon
+        title: "Serviço de Limpeza Residencial",
+        description: "Limpeza completa de casas e apartamentos. Equipe experiente, produtos de qualidade. Orçamento sem compromisso.",
+        imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        price: 15000, // R$ 150.00
+        whatsappNumber: "11999990001",
+        externalLink: "https://limpezatotal.com.br",
+        location: "São Paulo - SP",
+        isFeatured: true,
+        categoryId: categoryIds[0], // Limpeza
+        userId: userIds[0],
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       },
       {
-        title: "Notebook Gamer Dell G15 RTX 3060",
-        description: "Notebook gamer com placa RTX 3060, ideal para jogos e trabalho",
+        title: "Instalação e Reparo de Torneiras",
+        description: "Encanador profissional para instalação, reparo e manutenção de torneiras, chuveiros e conexões hidráulicas.",
+        imageUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        price: 8000, // R$ 80.00
+        whatsappNumber: "21999990002",
+        location: "Rio de Janeiro - RJ",
+        isFeatured: false,
+        categoryId: categoryIds[1], // Encanamento
+        userId: userIds[1],
+        expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days
+      },
+      {
+        title: "Notebook Gamer usado - RTX 3060",
+        description: "Notebook Dell G15 em ótimo estado, usado por apenas 6 meses. Ideal para jogos e trabalho. Acompanha carregador e caixa original.",
         imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 599900, // R$ 5,999.00
-        salePrice: 329900, // R$ 3,299.00
-        discountPercentage: 45,
-        dealUrl: "https://dell.com.br/notebook-gamer-g15",
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-        isHot: true,
-        categoryId: categoryIds[1], // Eletrônicos
-        storeId: storeIds[5], // Dell
-      },
-      {
-        title: "Air Fryer Philips Walita 4.1L",
-        description: "Fritadeira sem óleo com tecnologia Rapid Air",
-        imageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 66900, // R$ 669.00
-        salePrice: 29900, // R$ 299.00
-        discountPercentage: 55,
-        dealUrl: "https://magazineluiza.com.br/air-fryer-philips",
-        expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000), // 6 hours
-        isHot: true,
-        categoryId: categoryIds[2], // Casa e Jardim
-        storeId: storeIds[1], // Magazine Luiza
-      },
-      {
-        title: "Tênis Nike Air Max 270",
-        description: "Tênis esportivo com tecnologia Air Max para máximo conforto",
-        imageUrl: "https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 59900, // R$ 599.00
-        salePrice: 38900, // R$ 389.00
-        discountPercentage: 35,
-        dealUrl: "https://nike.com.br/tenis-air-max-270",
-        expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
-        isHot: false,
-        categoryId: categoryIds[6], // Esportes
-        storeId: storeIds[4], // Nike
-      },
-      {
-        title: "Headset Gamer HyperX Cloud II",
-        description: "Headset gamer com som surround 7.1 e microfone removível",
-        imageUrl: "https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 39900, // R$ 399.00
-        salePrice: 29900, // R$ 299.00
-        discountPercentage: 25,
-        dealUrl: "https://americanas.com.br/headset-hyperx-cloud-ii",
-        expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days
-        isHot: false,
-        categoryId: categoryIds[4], // Games
-        storeId: storeIds[2], // Americanas
-      },
-      {
-        title: "Smart TV Samsung 55\" 4K Crystal UHD",
-        description: "Smart TV 55 polegadas com resolução 4K e HDR",
-        imageUrl: "https://images.unsplash.com/photo-1593784991095-a205069470b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-        originalPrice: 319900, // R$ 3,199.00
-        salePrice: 189900, // R$ 1,899.00
-        discountPercentage: 40,
-        dealUrl: "https://casasbahia.com.br/smart-tv-samsung-55",
-        expiresAt: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 4 days
-        isHot: false,
-        categoryId: categoryIds[1], // Eletrônicos
-        storeId: storeIds[3], // Casas Bahia
-      },
-    ];
-
-    dealData.forEach(deal => {
-      const id = randomUUID();
-      this.deals.set(id, { id, ...deal, usageCount: Math.floor(Math.random() * 300), isVerified: true });
-    });
-
-    // Seed coupons
-    const couponData = [
-      {
-        code: "MAGALU15",
-        title: "15% OFF",
-        description: "Em compras acima de R$ 299",
-        discountType: "percentage",
-        discountValue: 15,
-        minPurchase: 29900, // R$ 299.00
-        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days
-        isActive: true,
-        storeId: storeIds[1], // Magazine Luiza
-      },
-      {
-        code: "PRIMEIRACOMPRA",
-        title: "R$ 50 OFF",
-        description: "Primeira compra no app",
-        discountType: "fixed",
-        discountValue: 5000, // R$ 50.00
-        minPurchase: 10000, // R$ 100.00
+        price: 280000, // R$ 2,800.00
+        whatsappNumber: "31999990003",
+        externalLink: "https://olx.com.br/notebook-gamer-dell",
+        location: "Belo Horizonte - MG",
+        isFeatured: true,
+        categoryId: categoryIds[5], // Eletrônicos
+        userId: userIds[2],
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        isActive: true,
-        storeId: storeIds[0], // Amazon
+      },
+      {
+        title: "Desenvolvedor Frontend - React",
+        description: "Vaga para desenvolvedor frontend com experiência em React, TypeScript e Tailwind CSS. Trabalho remoto, CLT, excelentes benefícios.",
+        imageUrl: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        whatsappNumber: "85999990004",
+        externalLink: "https://empresa.com.br/vagas/frontend",
+        location: "Remoto",
+        isFeatured: false,
+        categoryId: categoryIds[9], // Tecnologia (job)
+        userId: userIds[3],
+        expiresAt: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000), // 20 days
+      },
+      {
+        title: "Mercado de Startups Cresce 40% no Brasil",
+        description: "Segundo relatório da ABSTARTUPS, o ecossistema brasileiro de startups registrou crescimento expressivo em 2024, com destaque para fintechs e healthtechs.",
+        imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        externalLink: "https://abstartups.com.br/relatorio-2024",
+        location: "Brasil",
+        isFeatured: true,
+        categoryId: categoryIds[13], // Economia (news)
+        userId: userIds[0],
+        expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
       },
     ];
 
-    couponData.forEach(coupon => {
+    postData.forEach(post => {
       const id = randomUUID();
-      this.coupons.set(id, { id, ...coupon, usageCount: Math.floor(Math.random() * 100) });
+      this.posts.set(id, { 
+        id, 
+        title: post.title,
+        description: post.description,
+        imageUrl: post.imageUrl || null,
+        price: post.price || null,
+        whatsappNumber: post.whatsappNumber || null,
+        externalLink: post.externalLink || null,
+        location: post.location || null,
+        isActive: true,
+        isFeatured: post.isFeatured || false,
+        viewCount: Math.floor(Math.random() * 500), 
+        contactCount: Math.floor(Math.random() * 50),
+        createdAt: new Date(),
+        expiresAt: post.expiresAt || null,
+        categoryId: post.categoryId || null,
+        userId: post.userId || null
+      });
     });
 
-    // Update category deal counts
-    this.updateCategoryDealCounts();
+    // Update category post counts
+    this.updateCategoryPostCounts();
   }
 
-  private updateCategoryDealCounts() {
+  private updateCategoryPostCounts() {
     const counts = new Map<string, number>();
-    this.deals.forEach(deal => {
-      if (deal.categoryId) {
-        counts.set(deal.categoryId, (counts.get(deal.categoryId) || 0) + 1);
+    this.posts.forEach(post => {
+      if (post.categoryId) {
+        counts.set(post.categoryId, (counts.get(post.categoryId) || 0) + 1);
       }
     });
 
     this.categories.forEach((category, id) => {
-      this.categories.set(id, { ...category, dealCount: counts.get(id) || 0 });
+      this.categories.set(id, { ...category, postCount: counts.get(id) || 0 });
     });
   }
 
   // Categories
-  async getCategories(): Promise<Category[]> {
-    return Array.from(this.categories.values()).sort((a, b) => b.dealCount - a.dealCount);
+  async getCategories(type?: string): Promise<Category[]> {
+    let categories = Array.from(this.categories.values());
+    if (type) {
+      categories = categories.filter(cat => cat.type === type);
+    }
+    return categories.sort((a, b) => (b.postCount || 0) - (a.postCount || 0));
   }
 
   async getCategoryBySlug(slug: string): Promise<Category | undefined> {
@@ -232,168 +218,144 @@ export class MemStorage implements IStorage {
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = randomUUID();
-    const category: Category = { ...insertCategory, id, dealCount: 0 };
+    const category: Category = { ...insertCategory, id, postCount: 0 };
     this.categories.set(id, category);
     return category;
   }
 
-  // Stores
-  async getStores(): Promise<Store[]> {
-    return Array.from(this.stores.values()).sort((a, b) => a.name.localeCompare(b.name));
+  // Users
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async getStoreById(id: string): Promise<Store | undefined> {
-    return this.stores.get(id);
+  async getUserById(id: string): Promise<User | undefined> {
+    return this.users.get(id);
   }
 
-  async createStore(insertStore: InsertStore): Promise<Store> {
+  async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const store: Store = { ...insertStore, id };
-    this.stores.set(id, store);
-    return store;
+    const user: User = { ...insertUser, id, createdAt: new Date() };
+    this.users.set(id, user);
+    return user;
   }
 
-  // Deals
-  async getDeals(options: {
+  // Posts
+  async getPosts(options: {
     categoryId?: string;
-    storeId?: string;
-    isHot?: boolean;
+    type?: string;
+    isFeatured?: boolean;
     limit?: number;
     search?: string;
-  } = {}): Promise<DealWithRelations[]> {
-    let deals = Array.from(this.deals.values());
+    location?: string;
+  } = {}): Promise<PostWithRelations[]> {
+    let posts = Array.from(this.posts.values()).filter(post => post.isActive);
 
     // Filter by category
     if (options.categoryId) {
-      deals = deals.filter(deal => deal.categoryId === options.categoryId);
+      posts = posts.filter(post => post.categoryId === options.categoryId);
     }
 
-    // Filter by store
-    if (options.storeId) {
-      deals = deals.filter(deal => deal.storeId === options.storeId);
+    // Filter by type (through category)
+    if (options.type) {
+      const categoriesOfType = Array.from(this.categories.values()).filter(cat => cat.type === options.type);
+      const categoryIds = categoriesOfType.map(cat => cat.id);
+      posts = posts.filter(post => post.categoryId && categoryIds.includes(post.categoryId));
     }
 
-    // Filter by hot deals
-    if (options.isHot !== undefined) {
-      deals = deals.filter(deal => deal.isHot === options.isHot);
+    // Filter by featured
+    if (options.isFeatured !== undefined) {
+      posts = posts.filter(post => post.isFeatured === options.isFeatured);
     }
 
     // Search filter
     if (options.search) {
       const searchLower = options.search.toLowerCase();
-      deals = deals.filter(deal => 
-        deal.title.toLowerCase().includes(searchLower) ||
-        (deal.description?.toLowerCase().includes(searchLower))
+      posts = posts.filter(post => 
+        post.title.toLowerCase().includes(searchLower) ||
+        post.description.toLowerCase().includes(searchLower) ||
+        (post.location?.toLowerCase().includes(searchLower))
       );
     }
 
-    // Sort by hot deals first, then by discount percentage
-    deals.sort((a, b) => {
-      if (a.isHot && !b.isHot) return -1;
-      if (!a.isHot && b.isHot) return 1;
-      return b.discountPercentage - a.discountPercentage;
+    // Location filter
+    if (options.location) {
+      const locationLower = options.location.toLowerCase();
+      posts = posts.filter(post => 
+        post.location?.toLowerCase().includes(locationLower)
+      );
+    }
+
+    // Sort by featured first, then by creation date
+    posts.sort((a, b) => {
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+      return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
     });
 
     // Apply limit
     if (options.limit) {
-      deals = deals.slice(0, options.limit);
+      posts = posts.slice(0, options.limit);
     }
 
     // Add relations
-    return deals.map(deal => ({
-      ...deal,
-      category: deal.categoryId ? this.categories.get(deal.categoryId) || null : null,
-      store: deal.storeId ? this.stores.get(deal.storeId) || null : null,
+    return posts.map(post => ({
+      ...post,
+      category: post.categoryId ? this.categories.get(post.categoryId) || null : null,
+      user: post.userId ? this.users.get(post.userId) || null : null,
     }));
   }
 
-  async getDealById(id: string): Promise<DealWithRelations | undefined> {
-    const deal = this.deals.get(id);
-    if (!deal) return undefined;
+  async getPostById(id: string): Promise<PostWithRelations | undefined> {
+    const post = this.posts.get(id);
+    if (!post) return undefined;
 
     return {
-      ...deal,
-      category: deal.categoryId ? this.categories.get(deal.categoryId) || null : null,
-      store: deal.storeId ? this.stores.get(deal.storeId) || null : null,
+      ...post,
+      category: post.categoryId ? this.categories.get(post.categoryId) || null : null,
+      user: post.userId ? this.users.get(post.userId) || null : null,
     };
   }
 
-  async createDeal(insertDeal: InsertDeal): Promise<Deal> {
+  async createPost(insertPost: InsertPost): Promise<Post> {
     const id = randomUUID();
-    const deal: Deal = { ...insertDeal, id, usageCount: 0 };
-    this.deals.set(id, deal);
-    this.updateCategoryDealCounts();
-    return deal;
-  }
-
-  async incrementDealUsage(id: string): Promise<void> {
-    const deal = this.deals.get(id);
-    if (deal) {
-      this.deals.set(id, { ...deal, usageCount: deal.usageCount + 1 });
-    }
-  }
-
-  // Coupons
-  async getCoupons(options: {
-    storeId?: string;
-    isActive?: boolean;
-    limit?: number;
-  } = {}): Promise<CouponWithStore[]> {
-    let coupons = Array.from(this.coupons.values());
-
-    // Filter by store
-    if (options.storeId) {
-      coupons = coupons.filter(coupon => coupon.storeId === options.storeId);
-    }
-
-    // Filter by active status
-    if (options.isActive !== undefined) {
-      coupons = coupons.filter(coupon => coupon.isActive === options.isActive);
-    }
-
-    // Sort by expiration date
-    coupons.sort((a, b) => {
-      if (!a.expiresAt && !b.expiresAt) return 0;
-      if (!a.expiresAt) return 1;
-      if (!b.expiresAt) return -1;
-      return a.expiresAt.getTime() - b.expiresAt.getTime();
-    });
-
-    // Apply limit
-    if (options.limit) {
-      coupons = coupons.slice(0, options.limit);
-    }
-
-    // Add store relation
-    return coupons.map(coupon => ({
-      ...coupon,
-      store: coupon.storeId ? this.stores.get(coupon.storeId) || null : null,
-    }));
-  }
-
-  async getCouponById(id: string): Promise<CouponWithStore | undefined> {
-    const coupon = this.coupons.get(id);
-    if (!coupon) return undefined;
-
-    return {
-      ...coupon,
-      store: coupon.storeId ? this.stores.get(coupon.storeId) || null : null,
+    const post: Post = { 
+      id,
+      title: insertPost.title,
+      description: insertPost.description,
+      imageUrl: insertPost.imageUrl || null,
+      price: insertPost.price || null,
+      whatsappNumber: insertPost.whatsappNumber || null,
+      externalLink: insertPost.externalLink || null,
+      location: insertPost.location || null,
+      isActive: insertPost.isActive !== undefined ? insertPost.isActive : true,
+      isFeatured: insertPost.isFeatured || false,
+      viewCount: 0, 
+      contactCount: 0, 
+      createdAt: new Date(),
+      expiresAt: insertPost.expiresAt || null,
+      categoryId: insertPost.categoryId || null,
+      userId: insertPost.userId || null
     };
+    this.posts.set(id, post);
+    this.updateCategoryPostCounts();
+    return post;
   }
 
-  async createCoupon(insertCoupon: InsertCoupon): Promise<Coupon> {
-    const id = randomUUID();
-    const coupon: Coupon = { ...insertCoupon, id, usageCount: 0 };
-    this.coupons.set(id, coupon);
-    return coupon;
-  }
-
-  async incrementCouponUsage(id: string): Promise<void> {
-    const coupon = this.coupons.get(id);
-    if (coupon) {
-      this.coupons.set(id, { ...coupon, usageCount: coupon.usageCount + 1 });
+  async incrementPostView(id: string): Promise<void> {
+    const post = this.posts.get(id);
+    if (post) {
+      this.posts.set(id, { ...post, viewCount: (post.viewCount || 0) + 1 });
     }
   }
+
+  async incrementPostContact(id: string): Promise<void> {
+    const post = this.posts.get(id);
+    if (post) {
+      this.posts.set(id, { ...post, contactCount: (post.contactCount || 0) + 1 });
+    }
+  }
+
+
 }
 
 export const storage = new MemStorage();

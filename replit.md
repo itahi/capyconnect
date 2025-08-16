@@ -1,8 +1,8 @@
-# PromoHub Brasil - Deal Aggregator Platform
+# ServiçoHub Brasil - Marketplace Platform
 
 ## Overview
 
-PromoHub Brasil is a Brazilian deals and coupons aggregation platform built as a full-stack web application. The platform allows users to browse deals across various categories, search for specific products, and access promotional coupons from different stores. The application features a modern React frontend with a Node.js/Express backend, designed to provide users with a seamless deal discovery experience.
+ServiçoHub Brasil is a comprehensive Brazilian marketplace platform built as a full-stack web application. The platform allows users to post and browse services, products, news, and job opportunities. Users can include WhatsApp contact information and external links for direct communication and redirection. The application features a modern React frontend with a Node.js/Express backend, designed to provide a complete marketplace experience with purple branding.
 
 ## User Preferences
 
@@ -50,11 +50,10 @@ Preferred communication style: Simple, everyday language.
 - **Theming**: CSS custom properties for consistent color scheme and dark mode support
 
 ### API Structure
-- **Categories**: CRUD operations for deal categories with slug-based routing
-- **Stores**: Store management with verification status and metadata
-- **Deals**: Deal aggregation with filtering by category, store, popularity, and search
-- **Coupons**: Coupon management with activation tracking and expiration handling
-- **Usage Tracking**: Analytics for deal and coupon usage patterns
+- **Categories**: CRUD operations for marketplace categories (services, products, news, jobs)
+- **Posts**: Post management for services, products, news, and job listings
+- **Users**: User management with contact information and WhatsApp integration
+- **Contact Tracking**: Analytics for WhatsApp redirects and link clicks
 
 ## External Dependencies
 

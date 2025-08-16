@@ -24,11 +24,11 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
   
-  /* Brazilian color scheme */
-  --brasil-green: hsl(144, 100%, 35%);
-  --brasil-blue: hsl(207, 100%, 40%);
-  --brasil-yellow: hsl(51, 100%, 50%);
-  --accent-orange: hsl(14, 100%, 60%);
+  /* Purple marketplace color scheme */
+  --primary-purple: hsl(270, 60%, 50%);
+  --secondary-purple: hsl(280, 70%, 60%);
+  --accent-purple: hsl(260, 80%, 65%);
+  --light-purple: hsl(270, 50%, 95%);
 }
 
 .dark {
@@ -65,59 +65,55 @@
 }
 
 @layer utilities {
-  .brasil-green {
-    color: var(--brasil-green);
+  .primary-purple {
+    color: var(--primary-purple);
   }
   
-  .brasil-blue {
-    color: var(--brasil-blue);
+  .secondary-purple {
+    color: var(--secondary-purple);
   }
   
-  .brasil-yellow {
-    color: var(--brasil-yellow);
+  .accent-purple {
+    color: var(--accent-purple);
   }
   
-  .accent-orange {
-    color: var(--accent-orange);
+  .bg-primary-purple {
+    background-color: var(--primary-purple);
   }
   
-  .bg-brasil-green {
-    background-color: var(--brasil-green);
+  .bg-secondary-purple {
+    background-color: var(--secondary-purple);
   }
   
-  .bg-brasil-blue {
-    background-color: var(--brasil-blue);
+  .bg-accent-purple {
+    background-color: var(--accent-purple);
   }
   
-  .bg-brasil-yellow {
-    background-color: var(--brasil-yellow);
+  .bg-light-purple {
+    background-color: var(--light-purple);
   }
   
-  .bg-accent-orange {
-    background-color: var(--accent-orange);
+  .border-primary-purple {
+    border-color: var(--primary-purple);
   }
   
-  .border-brasil-green {
-    border-color: var(--brasil-green);
+  .hover\:bg-primary-purple:hover {
+    background-color: hsl(270, 60%, 45%);
   }
   
-  .hover\:bg-brasil-green:hover {
-    background-color: hsl(144, 100%, 30%);
+  .hover\:bg-secondary-purple:hover {
+    background-color: hsl(280, 70%, 55%);
   }
   
-  .hover\:bg-brasil-blue:hover {
-    background-color: hsl(207, 100%, 35%);
+  .text-primary-purple {
+    color: var(--primary-purple);
   }
   
-  .text-brasil-green {
-    color: var(--brasil-green);
+  .text-secondary-purple {
+    color: var(--secondary-purple);
   }
   
-  .text-brasil-blue {
-    color: var(--brasil-blue);
-  }
-  
-  .text-brasil-yellow {
-    color: var(--brasil-yellow);
+  .text-accent-purple {
+    color: var(--accent-purple);
   }
 }

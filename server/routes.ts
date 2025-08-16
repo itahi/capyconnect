@@ -7,7 +7,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {
-      const categories = await storage.getCategories();
+      const { type } = req.query;
+      const categories = await storage.getCategories(type ? String(type) : undefined);
       res.json(categories);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch categories" });
@@ -27,95 +28,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Stores
-  app.get("/api/stores", async (req, res) => {
+  // Users
+  app.get("/api/users", async (req, res) => {
     try {
-      const stores = await storage.getStores();
-      res.json(stores);
+      const users = await storage.getUsers();
+      res.json(users);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch stores" });
+      res.status(500).json({ message: "Failed to fetch users" });
     }
   });
 
-  // Deals
-  app.get("/api/deals", async (req, res) => {
+  // Posts
+  app.get("/api/posts", async (req, res) => {
     try {
-      const { categoryId, storeId, isHot, limit, search } = req.query;
+      const { categoryId, type, isFeatured, limit, search, location } = req.query;
       
       const options: any = {};
       if (categoryId) options.categoryId = String(categoryId);
-      if (storeId) options.storeId = String(storeId);
-      if (isHot !== undefined) options.isHot = isHot === 'true';
+      if (type) options.type = String(type);
+      if (isFeatured !== undefined) options.isFeatured = isFeatured === 'true';
       if (limit) options.limit = parseInt(String(limit));
       if (search) options.search = String(search);
+      if (location) options.location = String(location);
 
-      const deals = await storage.getDeals(options);
-      res.json(deals);
+      const posts = await storage.getPosts(options);
+      res.json(posts);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch deals" });
+      res.status(500).json({ message: "Failed to fetch posts" });
     }
   });
 
-  app.get("/api/deals/:id", async (req, res) => {
+  app.get("/api/posts/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const deal = await storage.getDealById(id);
-      if (!deal) {
-        return res.status(404).json({ message: "Deal not found" });
+      const post = await storage.getPostById(id);
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
       }
-      res.json(deal);
+      res.json(post);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch deal" });
+      res.status(500).json({ message: "Failed to fetch post" });
     }
   });
 
-  app.post("/api/deals/:id/use", async (req, res) => {
+  app.post("/api/posts/:id/view", async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.incrementDealUsage(id);
+      await storage.incrementPostView(id);
       res.json({ success: true });
     } catch (error) {
-      res.status(500).json({ message: "Failed to increment deal usage" });
+      res.status(500).json({ message: "Failed to increment post views" });
     }
   });
 
-  // Coupons
-  app.get("/api/coupons", async (req, res) => {
-    try {
-      const { storeId, isActive, limit } = req.query;
-      
-      const options: any = {};
-      if (storeId) options.storeId = String(storeId);
-      if (isActive !== undefined) options.isActive = isActive === 'true';
-      if (limit) options.limit = parseInt(String(limit));
-
-      const coupons = await storage.getCoupons(options);
-      res.json(coupons);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch coupons" });
-    }
-  });
-
-  app.get("/api/coupons/:id", async (req, res) => {
+  app.post("/api/posts/:id/contact", async (req, res) => {
     try {
       const { id } = req.params;
-      const coupon = await storage.getCouponById(id);
-      if (!coupon) {
-        return res.status(404).json({ message: "Coupon not found" });
-      }
-      res.json(coupon);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch coupon" });
-    }
-  });
-
-  app.post("/api/coupons/:id/use", async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.incrementCouponUsage(id);
+      await storage.incrementPostContact(id);
       res.json({ success: true });
     } catch (error) {
-      res.status(500).json({ message: "Failed to increment coupon usage" });
+      res.status(500).json({ message: "Failed to increment post contacts" });
     }
   });
 
