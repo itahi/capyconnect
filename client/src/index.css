@@ -24,11 +24,11 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
   
-  /* Purple marketplace color scheme */
-  --primary-purple: hsl(270, 60%, 50%);
-  --secondary-purple: hsl(280, 70%, 60%);
-  --accent-purple: hsl(260, 80%, 65%);
-  --light-purple: hsl(270, 50%, 95%);
+  /* Yellow marketplace color scheme */
+  --primary-yellow: hsl(45, 93%, 47%);
+  --secondary-yellow: hsl(48, 100%, 67%);
+  --accent-yellow: hsl(43, 96%, 56%);
+  --light-yellow: hsl(48, 100%, 96%);
 }
 
 .dark {
@@ -65,55 +65,55 @@
 }
 
 @layer utilities {
-  .primary-purple {
-    color: var(--primary-purple);
+  .primary-yellow {
+    color: var(--primary-yellow);
   }
   
-  .secondary-purple {
-    color: var(--secondary-purple);
+  .secondary-yellow {
+    color: var(--secondary-yellow);
   }
   
-  .accent-purple {
-    color: var(--accent-purple);
+  .accent-yellow {
+    color: var(--accent-yellow);
   }
   
-  .bg-primary-purple {
-    background-color: var(--primary-purple);
+  .bg-primary-yellow {
+    background-color: var(--primary-yellow);
   }
   
-  .bg-secondary-purple {
-    background-color: var(--secondary-purple);
+  .bg-secondary-yellow {
+    background-color: var(--secondary-yellow);
   }
   
-  .bg-accent-purple {
-    background-color: var(--accent-purple);
+  .bg-accent-yellow {
+    background-color: var(--accent-yellow);
   }
   
-  .bg-light-purple {
-    background-color: var(--light-purple);
+  .bg-light-yellow {
+    background-color: var(--light-yellow);
   }
   
-  .border-primary-purple {
-    border-color: var(--primary-purple);
+  .border-primary-yellow {
+    border-color: var(--primary-yellow);
   }
   
-  .hover\:bg-primary-purple:hover {
-    background-color: hsl(270, 60%, 45%);
+  .hover\:bg-primary-yellow:hover {
+    background-color: hsl(45, 93%, 42%);
   }
   
-  .hover\:bg-secondary-purple:hover {
-    background-color: hsl(280, 70%, 55%);
+  .hover\:bg-secondary-yellow:hover {
+    background-color: hsl(48, 100%, 62%);
   }
   
-  .text-primary-purple {
-    color: var(--primary-purple);
+  .text-primary-yellow {
+    color: var(--primary-yellow);
   }
   
-  .text-secondary-purple {
-    color: var(--secondary-purple);
+  .text-secondary-yellow {
+    color: var(--secondary-yellow);
   }
   
-  .text-accent-purple {
-    color: var(--accent-purple);
+  .text-accent-yellow {
+    color: var(--accent-yellow);
   }
 }

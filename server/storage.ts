@@ -86,10 +86,10 @@ export class MemStorage implements IStorage {
       this.users.set(id, { 
         id, 
         name: user.name,
-        email: user.email || null,
-        phone: user.phone || null,
-        whatsapp: user.whatsapp || null,
-        location: user.location || null,
+        email: user.email ?? null,
+        phone: user.phone ?? null,
+        whatsapp: user.whatsapp ?? null,
+        location: user.location ?? null,
         isVerified: user.isVerified || false,
         createdAt: new Date()
       });
@@ -104,7 +104,7 @@ export class MemStorage implements IStorage {
       {
         title: "Serviço de Limpeza Residencial",
         description: "Limpeza completa de casas e apartamentos. Equipe experiente, produtos de qualidade. Orçamento sem compromisso.",
-        imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        imageUrls: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"],
         price: 15000, // R$ 150.00
         whatsappNumber: "11999990001",
         externalLink: "https://limpezatotal.com.br",
@@ -117,7 +117,7 @@ export class MemStorage implements IStorage {
       {
         title: "Instalação e Reparo de Torneiras",
         description: "Encanador profissional para instalação, reparo e manutenção de torneiras, chuveiros e conexões hidráulicas.",
-        imageUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        imageUrls: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"],
         price: 8000, // R$ 80.00
         whatsappNumber: "21999990002",
         location: "Rio de Janeiro - RJ",
@@ -129,7 +129,7 @@ export class MemStorage implements IStorage {
       {
         title: "Notebook Gamer usado - RTX 3060",
         description: "Notebook Dell G15 em ótimo estado, usado por apenas 6 meses. Ideal para jogos e trabalho. Acompanha carregador e caixa original.",
-        imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        imageUrls: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"],
         price: 280000, // R$ 2,800.00
         whatsappNumber: "31999990003",
         externalLink: "https://olx.com.br/notebook-gamer-dell",
@@ -142,7 +142,7 @@ export class MemStorage implements IStorage {
       {
         title: "Desenvolvedor Frontend - React",
         description: "Vaga para desenvolvedor frontend com experiência em React, TypeScript e Tailwind CSS. Trabalho remoto, CLT, excelentes benefícios.",
-        imageUrl: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        imageUrls: ["https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"],
         whatsappNumber: "85999990004",
         externalLink: "https://empresa.com.br/vagas/frontend",
         location: "Remoto",
@@ -154,7 +154,7 @@ export class MemStorage implements IStorage {
       {
         title: "Mercado de Startups Cresce 40% no Brasil",
         description: "Segundo relatório da ABSTARTUPS, o ecossistema brasileiro de startups registrou crescimento expressivo em 2024, com destaque para fintechs e healthtechs.",
-        imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+        imageUrls: ["https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"],
         externalLink: "https://abstartups.com.br/relatorio-2024",
         location: "Brasil",
         isFeatured: true,
@@ -170,7 +170,7 @@ export class MemStorage implements IStorage {
         id, 
         title: post.title,
         description: post.description,
-        imageUrl: post.imageUrl || null,
+        imageUrls: post.imageUrls || null,
         price: post.price || null,
         whatsappNumber: post.whatsappNumber || null,
         externalLink: post.externalLink || null,

@@ -27,7 +27,7 @@ export const posts = pgTable("posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  imageUrl: text("image_url"),
+  imageUrls: text("image_urls").array(), // Array of up to 3 image URLs
   price: integer("price"), // in cents, optional for services/jobs
   whatsappNumber: text("whatsapp_number"),
   externalLink: text("external_link"),

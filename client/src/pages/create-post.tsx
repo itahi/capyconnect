@@ -15,12 +15,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
+import { X, Upload } from "lucide-react";
 
 const createPostSchema = z.object({
   title: z.string().min(10, "Título deve ter pelo menos 10 caracteres"),
   description: z.string().min(30, "Descrição deve ter pelo menos 30 caracteres"),
   categoryId: z.string().min(1, "Selecione uma categoria"),
-  imageUrl: z.string().url("URL da imagem inválida").optional().or(z.literal("")),
   price: z.string().optional(),
   whatsappNumber: z.string().optional(),
   externalLink: z.string().url("URL inválida").optional().or(z.literal("")),
@@ -35,6 +37,7 @@ type CreatePostFormData = z.infer<typeof createPostSchema>;
 export default function CreatePost() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string>("service");
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -49,7 +52,6 @@ export default function CreatePost() {
       title: "",
       description: "",
       categoryId: "",
-      imageUrl: "",
       price: "",
       whatsappNumber: "",
       externalLink: "",
@@ -107,7 +109,7 @@ export default function CreatePost() {
         title: data.title,
         description: data.description,
         categoryId: data.categoryId,
-        imageUrl: data.imageUrl || null,
+        imageUrls: uploadedImages.length > 0 ? uploadedImages : null,
         price: data.price ? parseInt(data.price.replace(/\D/g, '')) : null,
         whatsappNumber: data.whatsappNumber || null,
         externalLink: data.externalLink || null,
@@ -186,6 +188,41 @@ export default function CreatePost() {
     }).format(cents / 100);
   };
 
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("POST", "/api/objects/upload", {});
+    return {
+      method: 'PUT' as const,
+      url: response.uploadURL,
+    };
+  };
+
+  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful && result.successful.length > 0) {
+      const imageURLs = result.successful.map(file => file.uploadURL);
+      
+      try {
+        // Process uploaded images to get normalized paths
+        const response = await apiRequest("PUT", "/api/images", { imageURLs });
+        setUploadedImages([...uploadedImages, ...response.objectPaths]);
+        
+        toast({
+          title: "Imagens carregadas!",
+          description: `${imageURLs.length} imagem(ns) carregada(s) com sucesso.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Erro ao processar imagens",
+          description: "Não foi possível processar as imagens carregadas.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    setUploadedImages(uploadedImages.filter((_, index) => index !== indexToRemove));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -209,7 +246,7 @@ export default function CreatePost() {
                 key={item.type}
                 className={`cursor-pointer transition-all ${
                   selectedType === item.type 
-                    ? 'ring-2 ring-primary-purple bg-light-purple' 
+                    ? 'ring-2 ring-primary-yellow bg-light-yellow' 
                     : 'hover:shadow-md'
                 }`}
                 onClick={() => setSelectedType(item.type)}
@@ -300,50 +337,78 @@ export default function CreatePost() {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Image URL */}
+                  {/* Image Upload Section */}
+                  <div className="space-y-4">
+                    <div>
+                      <FormLabel>Imagens do Produto (até 3)</FormLabel>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Adicione até 3 imagens para destacar melhor seu produto ou serviço.
+                      </p>
+                    </div>
+                    
+                    {/* Upload Button */}
+                    {uploadedImages.length < 3 && (
+                      <ObjectUploader
+                        maxNumberOfFiles={3 - uploadedImages.length}
+                        maxFileSize={5 * 1024 * 1024} // 5MB
+                        onGetUploadParameters={handleGetUploadParameters}
+                        onComplete={handleUploadComplete}
+                        buttonClassName="bg-primary-yellow hover:bg-primary-yellow/90 text-white"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Upload className="h-4 w-4" />
+                          <span>Adicionar Imagens</span>
+                        </div>
+                      </ObjectUploader>
+                    )}
+
+                    {/* Uploaded Images Preview */}
+                    {uploadedImages.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {uploadedImages.map((imagePath, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={imagePath}
+                              alt={`Imagem ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Price (if not news) */}
+                  {selectedType !== 'news' && (
                     <FormField
                       control={form.control}
-                      name="imageUrl"
+                      name="price"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>URL da Imagem</FormLabel>
+                          <FormLabel>{typeInfo.priceLabel}</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="https://exemplo.com/imagem.jpg"
-                              {...field} 
+                              placeholder="R$ 150,00"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '');
+                                field.onChange(value);
+                              }}
+                              value={field.value ? formatPrice(field.value) : ''}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    {/* Price (if not news) */}
-                    {selectedType !== 'news' && (
-                      <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{typeInfo.priceLabel}</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="R$ 150,00"
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value.replace(/\D/g, '');
-                                  field.onChange(value);
-                                }}
-                                value={field.value ? formatPrice(field.value) : ''}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-                  </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* WhatsApp */}

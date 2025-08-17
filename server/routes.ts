@@ -2,6 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import {
+  ObjectStorageService,
+  ObjectNotFoundError,
+} from "./objectStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Categories
@@ -127,6 +131,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: error.errors[0].message });
       }
       res.status(500).json({ message: "Failed to subscribe to newsletter" });
+    }
+  });
+
+  // Object storage routes for public file serving
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Object storage routes for image uploads
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Get upload URL for images
+  app.post("/api/objects/upload", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Process uploaded images and set them as public
+  app.put("/api/images", async (req, res) => {
+    if (!req.body.imageURLs || !Array.isArray(req.body.imageURLs)) {
+      return res.status(400).json({ error: "imageURLs array is required" });
+    }
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const processedPaths: string[] = [];
+
+      for (const imageURL of req.body.imageURLs) {
+        const objectPath = objectStorageService.normalizeObjectEntityPath(imageURL);
+        processedPaths.push(objectPath);
+      }
+
+      res.status(200).json({
+        objectPaths: processedPaths,
+      });
+    } catch (error) {
+      console.error("Error processing uploaded images:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
