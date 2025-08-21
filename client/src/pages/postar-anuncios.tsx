@@ -37,7 +37,11 @@ export default function PostarAnuncios() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  
+  // Temporarily disable auth check to test the page
+  const user = null;
+  const isAuthenticated = false;
+  const isLoading = false;
 
   const handleImagesChange = (imageUrls: string[]) => {
     setUploadedImages(imageUrls);
