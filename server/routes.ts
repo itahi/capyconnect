@@ -1,6 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { sessionConfig, requireAuth, optionalAuth } from "./auth";
+import {
+  type Category,
+  type Post,
+  type PostWithRelations,
+  type UserProfile,
+  insertPostSchema,
+  insertCommentSchema,
+  loginSchema,
+  registerSchema,
+} from "@shared/schema";
 import { z } from "zod";
 import {
   ObjectStorageService,
@@ -8,6 +19,74 @@ import {
 } from "./objectStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session middleware
+  app.use(sessionConfig);
+  
+  // Auth routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = registerSchema.parse(req.body);
+      const user = await storage.register(userData);
+      req.session.userId = user.id;
+      res.json({ user, message: "Registration successful" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      if (error instanceof Error && error.message.includes("duplicate key")) {
+        return res.status(409).json({ error: "Email already registered" });
+      }
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const credentials = loginSchema.parse(req.body);
+      const user = await storage.login(credentials);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      req.session.userId = user.id;
+      res.json({ user, message: "Login successful" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.json({ message: "Logout successful" });
+    });
+  });
+
+  app.get("/api/auth/user", optionalAuth, async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
+    try {
+      const user = await storage.getUserById(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {
@@ -15,7 +94,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const categories = await storage.getCategories(type ? String(type) : undefined);
       res.json(categories);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch categories" });
+      console.error("Get categories error:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
     }
   });
 
@@ -24,26 +104,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { slug } = req.params;
       const category = await storage.getCategoryBySlug(slug);
       if (!category) {
-        return res.status(404).json({ message: "Category not found" });
+        return res.status(404).json({ error: "Category not found" });
       }
       res.json(category);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch category" });
-    }
-  });
-
-  // Users
-  app.get("/api/users", async (req, res) => {
-    try {
-      const users = await storage.getUsers();
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch users" });
+      console.error("Get category error:", error);
+      res.status(500).json({ error: "Failed to fetch category" });
     }
   });
 
   // Posts
-  app.get("/api/posts", async (req, res) => {
+  app.get("/api/posts", optionalAuth, async (req, res) => {
     try {
       const { categoryId, type, isFeatured, limit, search, location } = req.query;
       
@@ -54,87 +125,237 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (limit) options.limit = parseInt(String(limit));
       if (search) options.search = String(search);
       if (location) options.location = String(location);
+      if (req.session.userId) options.userId = req.session.userId;
 
       const posts = await storage.getPosts(options);
       res.json(posts);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch posts" });
+      console.error("Get posts error:", error);
+      res.status(500).json({ error: "Failed to fetch posts" });
     }
   });
 
-  app.get("/api/posts/:id", async (req, res) => {
+  app.get("/api/posts/:id", optionalAuth, async (req, res) => {
     try {
       const { id } = req.params;
-      const post = await storage.getPostById(id);
+      const post = await storage.getPostById(id, req.session.userId);
+      
       if (!post) {
-        return res.status(404).json({ message: "Post not found" });
+        return res.status(404).json({ error: "Post not found" });
       }
+
+      // Increment view count
+      await storage.incrementPostView(id);
+      
       res.json(post);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch post" });
+      console.error("Get post error:", error);
+      res.status(500).json({ error: "Failed to fetch post" });
     }
   });
 
-  app.post("/api/posts/:id/view", async (req, res) => {
+  app.post("/api/posts", requireAuth, async (req, res) => {
+    try {
+      const postData = insertPostSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+      });
+
+      const post = await storage.createPost(postData);
+      res.status(201).json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      console.error("Create post error:", error);
+      res.status(500).json({ error: "Failed to create post" });
+    }
+  });
+
+  app.put("/api/posts/:id", requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.incrementPostView(id);
-      res.json({ success: true });
+      const postData = insertPostSchema.partial().parse(req.body);
+      
+      const updatedPost = await storage.updatePost(id, postData, req.session.userId!);
+      
+      if (!updatedPost) {
+        return res.status(404).json({ error: "Post not found or unauthorized" });
+      }
+      
+      res.json(updatedPost);
     } catch (error) {
-      res.status(500).json({ message: "Failed to increment post views" });
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      console.error("Update post error:", error);
+      res.status(500).json({ error: "Failed to update post" });
     }
   });
 
+  app.delete("/api/posts/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deletePost(id, req.session.userId!);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Post not found or unauthorized" });
+      }
+      
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Delete post error:", error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
+  app.get("/api/user/posts", requireAuth, async (req, res) => {
+    try {
+      const posts = await storage.getUserPosts(req.session.userId!);
+      res.json(posts);
+    } catch (error) {
+      console.error("Get user posts error:", error);
+      res.status(500).json({ error: "Failed to fetch user posts" });
+    }
+  });
+
+  // Likes
+  app.post("/api/posts/:id/like", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.likePost(req.session.userId!, id);
+      
+      if (!success) {
+        return res.status(400).json({ error: "Failed to like post" });
+      }
+      
+      res.json({ message: "Post liked successfully" });
+    } catch (error) {
+      console.error("Like post error:", error);
+      res.status(500).json({ error: "Failed to like post" });
+    }
+  });
+
+  app.delete("/api/posts/:id/like", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.unlikePost(req.session.userId!, id);
+      
+      if (!success) {
+        return res.status(400).json({ error: "Failed to unlike post" });
+      }
+      
+      res.json({ message: "Post unliked successfully" });
+    } catch (error) {
+      console.error("Unlike post error:", error);
+      res.status(500).json({ error: "Failed to unlike post" });
+    }
+  });
+
+  // Comments
+  app.get("/api/posts/:id/comments", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const comments = await storage.getPostComments(id);
+      res.json(comments);
+    } catch (error) {
+      console.error("Get comments error:", error);
+      res.status(500).json({ error: "Failed to fetch comments" });
+    }
+  });
+
+  app.post("/api/posts/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const commentData = insertCommentSchema.parse({
+        ...req.body,
+        postId: id,
+        userId: req.session.userId,
+      });
+
+      const comment = await storage.addComment(commentData);
+      res.status(201).json(comment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      console.error("Add comment error:", error);
+      res.status(500).json({ error: "Failed to add comment" });
+    }
+  });
+
+  app.delete("/api/comments/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteComment(id, req.session.userId!);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Comment not found or unauthorized" });
+      }
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Delete comment error:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  // Favorites
+  app.get("/api/user/favorites", requireAuth, async (req, res) => {
+    try {
+      const favorites = await storage.getUserFavorites(req.session.userId!);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Get favorites error:", error);
+      res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
+  app.post("/api/posts/:id/favorite", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.addToFavorites(req.session.userId!, id);
+      
+      if (!success) {
+        return res.status(400).json({ error: "Failed to favorite post" });
+      }
+      
+      res.json({ message: "Post added to favorites" });
+    } catch (error) {
+      console.error("Add to favorites error:", error);
+      res.status(500).json({ error: "Failed to add to favorites" });
+    }
+  });
+
+  app.delete("/api/posts/:id/favorite", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.removeFromFavorites(req.session.userId!, id);
+      
+      if (!success) {
+        return res.status(400).json({ error: "Failed to remove from favorites" });
+      }
+      
+      res.json({ message: "Post removed from favorites" });
+    } catch (error) {
+      console.error("Remove from favorites error:", error);
+      res.status(500).json({ error: "Failed to remove from favorites" });
+    }
+  });
+
+  // Analytics
   app.post("/api/posts/:id/contact", async (req, res) => {
     try {
       const { id } = req.params;
       await storage.incrementPostContact(id);
-      res.json({ success: true });
+      res.json({ message: "Contact recorded" });
     } catch (error) {
-      res.status(500).json({ message: "Failed to increment post contacts" });
+      console.error("Record contact error:", error);
+      res.status(500).json({ error: "Failed to record contact" });
     }
   });
 
-  app.post("/api/posts", async (req, res) => {
-    try {
-      const post = await storage.createPost(req.body);
-      res.status(201).json(post);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to create post" });
-    }
-  });
-
-  app.post("/api/users", async (req, res) => {
-    try {
-      const user = await storage.createUser(req.body);
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to create user" });
-    }
-  });
-
-  // Newsletter subscription
-  app.post("/api/newsletter/subscribe", async (req, res) => {
-    try {
-      const emailSchema = z.object({
-        email: z.string().email("Email inválido"),
-      });
-
-      const { email } = emailSchema.parse(req.body);
-      
-      // In a real app, you would save this to a database and/or send to an email service
-      console.log(`Newsletter subscription: ${email}`);
-      
-      res.json({ success: true, message: "Email cadastrado com sucesso!" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
-      }
-      res.status(500).json({ message: "Failed to subscribe to newsletter" });
-    }
-  });
-
-  // Object storage routes for public file serving
+  // Object storage for image uploads
   app.get("/public-objects/:filePath(*)", async (req, res) => {
     const filePath = req.params.filePath;
     const objectStorageService = new ObjectStorageService();
@@ -150,7 +371,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object storage routes for image uploads
   app.get("/objects/:objectPath(*)", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
@@ -167,7 +387,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get upload URL for images
   app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
@@ -179,7 +398,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Process uploaded images and set them as public
   app.put("/api/images", async (req, res) => {
     if (!req.body.imageURLs || !Array.isArray(req.body.imageURLs)) {
       return res.status(400).json({ error: "imageURLs array is required" });
