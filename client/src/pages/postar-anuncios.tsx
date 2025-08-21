@@ -43,23 +43,13 @@ export default function PostarAnuncios() {
     setUploadedImages(imageUrls);
   };
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      setLocation("/login");
-    }
-  }, [isAuthenticated, isLoading, setLocation]);
-
+  // Show login prompt if not authenticated but don't redirect immediately
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-yellow"></div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -102,7 +92,15 @@ export default function PostarAnuncios() {
   });
 
   const onSubmit = async (data: CreatePostFormData) => {
-    if (!user) return;
+    if (!isAuthenticated) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa estar logado para postar anúncios.",
+        variant: "destructive",
+      });
+      setLocation("/login");
+      return;
+    }
 
     try {
       const postData: InsertPost = {
@@ -114,7 +112,7 @@ export default function PostarAnuncios() {
         whatsappNumber: data.whatsappNumber || null,
         externalLink: data.externalLink || null,
         location: data.location,
-        userId: user.id,
+        userId: user?.id || '',
         isActive: true,
         isFeatured: false,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
@@ -195,6 +193,20 @@ export default function PostarAnuncios() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Postar Anúncio</h1>
             <p className="text-gray-600">Escolha o tipo de conteúdo que deseja publicar</p>
+            {!isAuthenticated && (
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-yellow-800">
+                  <i className="fas fa-info-circle mr-2"></i>
+                  Você precisa estar logado para publicar anúncios. 
+                  <button 
+                    onClick={() => setLocation("/login")} 
+                    className="ml-2 text-yellow-800 underline hover:text-yellow-900"
+                  >
+                    Fazer login
+                  </button>
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Type Selection */}
@@ -383,18 +395,19 @@ export default function PostarAnuncios() {
                   {/* Image Upload Section */}
                   <div className="space-y-4">
                     <div>
-                      <FormLabel>Imagens (até 3)</FormLabel>
+                      <FormLabel>Imagens (opcional - até 3)</FormLabel>
                       <p className="text-sm text-gray-600 mb-3">
-                        Adicione até 3 imagens. Elas serão automaticamente redimensionadas e otimizadas.
+                        Adicione imagens para tornar seu anúncio mais atrativo. Elas serão automaticamente redimensionadas.
                       </p>
                     </div>
                     
-                    <ImageUploader
-                      onImagesChange={handleImagesChange}
-                      maxImages={3}
-                      currentImages={uploadedImages}
-                      disabled={createPostMutation.isPending}
-                    />
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <div className="space-y-2">
+                        <i className="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                        <p className="text-gray-500">Clique para adicionar imagens ou arraste e solte aqui</p>
+                        <p className="text-sm text-gray-400">PNG, JPG até 5MB cada</p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Submit Button */}
