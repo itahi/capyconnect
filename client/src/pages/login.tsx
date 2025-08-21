@@ -90,7 +90,7 @@ export default function Login() {
                           type="email"
                           placeholder="seu@email.com"
                           {...field}
-                          disabled={isLoggingIn}
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
