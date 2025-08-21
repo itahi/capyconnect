@@ -33,8 +33,7 @@ function Router() {
       <Route path="/categoria/:slug" component={Category} />
       <Route path="/post/:id" component={Post} />
       <Route path="/postar" component={CreatePost} />
-      <Route path="/postar-anuncios" component={TestPage} />
-      <Route path="/postar-anuncios-full" component={PostarAnuncios} />
+      <Route path="/postar-anuncios" component={PostarAnuncios} />
       <Route component={NotFound} />
     </Switch>
   );

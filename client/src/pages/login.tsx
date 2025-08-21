@@ -30,7 +30,7 @@ export default function Login() {
       await login(data);
       toast({
         title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao ServiçoHub Brasil.",
+        description: "Bem-vindo de volta ao CapyConnect.",
       });
       setLocation("/");
     } catch (error: any) {
@@ -47,8 +47,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-primary-yellow">ServiçoHub</h1>
-            <span className="ml-2 bg-accent-yellow text-white text-xs px-2 py-1 rounded-full font-semibold">BRASIL</span>
+            <h1 className="text-3xl font-bold text-primary-yellow">CapyConnect</h1>
           </Link>
         </div>
 

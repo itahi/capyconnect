@@ -33,7 +33,7 @@ export default function Register() {
       await register(data);
       toast({
         title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao ServiçoHub Brasil. Você já está logado.",
+        description: "Bem-vindo ao CapyConnect. Você já está logado.",
       });
       setLocation("/");
     } catch (error: any) {
@@ -50,8 +50,7 @@ export default function Register() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-primary-yellow">ServiçoHub</h1>
-            <span className="ml-2 bg-accent-yellow text-white text-xs px-2 py-1 rounded-full font-semibold">BRASIL</span>
+            <h1 className="text-3xl font-bold text-primary-yellow">CapyConnect</h1>
           </Link>
         </div>
 

@@ -38,10 +38,7 @@ export default function PostarAnuncios() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Temporarily disable auth check to test the page
-  const user = null;
-  const isAuthenticated = false;
-  const isLoading = false;
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   const handleImagesChange = (imageUrls: string[]) => {
     setUploadedImages(imageUrls);
@@ -116,7 +113,7 @@ export default function PostarAnuncios() {
         whatsappNumber: data.whatsappNumber || null,
         externalLink: data.externalLink || null,
         location: data.location,
-        userId: 'temp-user-id',
+        userId: user?.id || '',
         isActive: true,
         isFeatured: false,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
