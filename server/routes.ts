@@ -73,22 +73,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.get("/api/auth/user", optionalAuth, async (req, res) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-    
+  // Get current user
+  app.get("/api/auth/user", async (req, res) => {
     try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
       const user = await storage.getUserById(req.session.userId);
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(401).json({ error: "User not found" });
       }
+      
       res.json(user);
     } catch (error) {
       console.error("Get user error:", error);
-      res.status(500).json({ error: "Failed to fetch user" });
+      res.status(500).json({ error: "Failed to get user" });
     }
   });
+
+
 
   // Categories
   app.get("/api/categories", async (req, res) => {

@@ -412,9 +412,9 @@ export default function CreatePost() {
                     <Button 
                       type="submit" 
                       className="flex-1 bg-primary-purple text-white hover:bg-primary-purple font-semibold py-3"
-                      disabled={createPostMutation.isPending || createUserMutation.isPending}
+                      disabled={createPostMutation.isPending}
                     >
-                      {createPostMutation.isPending || createUserMutation.isPending ? "Publicando..." : "Publicar no Marketplace"}
+                      {createPostMutation.isPending ? "Publicando..." : "Publicar no Marketplace"}
                     </Button>
                     <Button 
                       type="button" 

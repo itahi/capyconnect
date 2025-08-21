@@ -134,8 +134,8 @@ export class DatabaseStorage implements IStorage {
         name: userData.name,
         email: userData.email,
         passwordHash: hashedPassword,
-        phone: userData.phone,
-        location: userData.location,
+        phone: userData.phone || null,
+        location: userData.location || null,
       })
       .returning();
 
@@ -347,10 +347,10 @@ export class DatabaseStorage implements IStorage {
       const isFavorited = await this.isPostFavorited(userId, post.id);
       const postComments = await this.getPostComments(post.id);
       
-      return { ...post, isLiked, isFavorited, comments: postComments };
+      return { ...post, isLiked, isFavorited, comments: postComments } as PostWithRelations;
     }
 
-    return post;
+    return post as PostWithRelations;
   }
 
   async createPost(post: InsertPost): Promise<Post> {

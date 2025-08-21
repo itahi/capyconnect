@@ -15,7 +15,7 @@ export function useAuth() {
     mutationFn: async (credentials: LoginData) => {
       return apiRequest("POST", "/api/auth/login", credentials);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.setQueryData(["/api/auth/user"], data.user);
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
     },
@@ -25,7 +25,7 @@ export function useAuth() {
     mutationFn: async (userData: RegisterData) => {
       return apiRequest("POST", "/api/auth/register", userData);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.setQueryData(["/api/auth/user"], data.user);
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
     },

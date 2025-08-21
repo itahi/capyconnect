@@ -215,7 +215,7 @@ export const registerSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   phone: z.string().optional(),
-  location: z.string().min(5, "Localização deve ter pelo menos 5 caracteres"),
+  location: z.string().optional(),
 });
 
 export type LoginData = z.infer<typeof loginSchema>;
