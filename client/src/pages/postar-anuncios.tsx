@@ -116,7 +116,7 @@ export default function PostarAnuncios() {
         whatsappNumber: data.whatsappNumber || null,
         externalLink: data.externalLink || null,
         location: data.location,
-        userId: user?.id || '',
+        userId: 'temp-user-id',
         isActive: true,
         isFeatured: false,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days

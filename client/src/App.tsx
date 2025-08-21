@@ -11,6 +11,7 @@ import Category from "@/pages/category";
 import Post from "@/pages/post";
 import CreatePost from "@/pages/create-post";
 import PostarAnuncios from "@/pages/postar-anuncios";
+import TestPage from "@/pages/test-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,7 +33,8 @@ function Router() {
       <Route path="/categoria/:slug" component={Category} />
       <Route path="/post/:id" component={Post} />
       <Route path="/postar" component={CreatePost} />
-      <Route path="/postar-anuncios" component={PostarAnuncios} />
+      <Route path="/postar-anuncios" component={TestPage} />
+      <Route path="/postar-anuncios-full" component={PostarAnuncios} />
       <Route component={NotFound} />
     </Switch>
   );
