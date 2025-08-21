@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { sessionConfig, requireAuth, optionalAuth } from "./auth";
@@ -17,6 +17,9 @@ import {
   ObjectStorageService,
   ObjectNotFoundError,
 } from "./objectStorage";
+import { ImageProcessor } from "./imageProcessor";
+import multer from "multer";
+import { randomUUID } from "crypto";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
@@ -387,6 +390,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Setup multer for file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+    fileFilter: (req: any, file: any, cb: any) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    },
+  });
+
   app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
@@ -395,6 +413,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Enhanced image upload with automatic processing
+  app.post("/api/images/upload", upload.array('images', 3), async (req: any, res) => {
+    const objectStorageService = new ObjectStorageService();
+    
+    try {
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return res.status(400).json({ error: "No images provided" });
+      }
+
+      const uploadPromises = req.files.map(async (file: any) => {
+        // Validate image
+        const isValid = await ImageProcessor.validateImage(file.buffer);
+        if (!isValid) {
+          throw new Error(`Invalid image file: ${file.originalname}`);
+        }
+
+        // Process image (resize, convert to PNG, optimize)
+        const processedBuffer = await ImageProcessor.processImage(file.buffer, {
+          maxWidth: 1200,
+          maxHeight: 800,
+          quality: 85,
+          format: "png",
+        });
+
+        // Get upload URL
+        const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+
+        // Upload processed image
+        const response = await fetch(uploadURL, {
+          method: "PUT",
+          body: processedBuffer,
+          headers: {
+            "Content-Type": "image/png",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Upload failed for ${file.originalname}`);
+        }
+
+        return uploadURL.split('?')[0]; // Remove query parameters
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Normalize paths
+      const processedPaths: string[] = [];
+      for (const imageURL of uploadedUrls) {
+        const objectPath = objectStorageService.normalizeObjectEntityPath(imageURL);
+        processedPaths.push(objectPath);
+      }
+
+      res.json({
+        success: true,
+        imageUrls: processedPaths,
+        message: `${(req.files as any[]).length} image(s) uploaded and processed successfully`,
+      });
+
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      res.status(500).json({ 
+        error: "Failed to upload images",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

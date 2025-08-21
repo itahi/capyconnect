@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useLocation } from "wouter";
 import type { Category, InsertPost } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +16,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import type { UploadResult } from "@uppy/core";
-import { X, Upload } from "lucide-react";
+import { ImageUploader } from "@/components/ImageUploader";
+import { X } from "lucide-react";
 
 const createPostSchema = z.object({
   title: z.string().min(10, "Título deve ter pelo menos 10 caracteres"),
@@ -27,9 +27,6 @@ const createPostSchema = z.object({
   whatsappNumber: z.string().optional(),
   externalLink: z.string().url("URL inválida").optional().or(z.literal("")),
   location: z.string().min(5, "Localização deve ter pelo menos 5 caracteres"),
-  userName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  userEmail: z.string().email("Email inválido").optional().or(z.literal("")),
-  userPhone: z.string().optional(),
 });
 
 type CreatePostFormData = z.infer<typeof createPostSchema>;
@@ -41,6 +38,30 @@ export default function CreatePost() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  const handleImagesChange = (imageUrls: string[]) => {
+    setUploadedImages(imageUrls);
+  };
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      setLocation("/login");
+    }
+  }, [isAuthenticated, isLoading, setLocation]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-yellow"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: categories } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
@@ -56,15 +77,6 @@ export default function CreatePost() {
       whatsappNumber: "",
       externalLink: "",
       location: "",
-      userName: "",
-      userEmail: "",
-      userPhone: "",
-    },
-  });
-
-  const createUserMutation = useMutation({
-    mutationFn: async (userData: any) => {
-      return apiRequest("POST", "/api/users", userData);
     },
   });
 
@@ -91,20 +103,9 @@ export default function CreatePost() {
   });
 
   const onSubmit = async (data: CreatePostFormData) => {
+    if (!user) return;
+
     try {
-      // First create the user
-      const userData = {
-        name: data.userName,
-        email: data.userEmail || null,
-        phone: data.userPhone || null,
-        whatsapp: data.whatsappNumber || null,
-        location: data.location,
-        isVerified: false,
-      };
-
-      const user = await createUserMutation.mutateAsync(userData);
-
-      // Then create the post
       const postData: InsertPost = {
         title: data.title,
         description: data.description,
@@ -123,8 +124,8 @@ export default function CreatePost() {
       createPostMutation.mutate(postData);
     } catch (error) {
       toast({
-        title: "Erro ao criar usuário",
-        description: "Não foi possível criar o usuário. Tente novamente.",
+        title: "Erro ao criar post",
+        description: "Não foi possível criar o post. Tente novamente.",
         variant: "destructive",
       });
     }
@@ -188,40 +189,9 @@ export default function CreatePost() {
     }).format(cents / 100);
   };
 
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload", {});
-    return {
-      method: 'PUT' as const,
-      url: response.uploadURL,
-    };
-  };
 
-  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    if (result.successful && result.successful.length > 0) {
-      const imageURLs = result.successful.map(file => file.uploadURL);
-      
-      try {
-        // Process uploaded images to get normalized paths
-        const response = await apiRequest("PUT", "/api/images", { imageURLs });
-        setUploadedImages([...uploadedImages, ...response.objectPaths]);
-        
-        toast({
-          title: "Imagens carregadas!",
-          description: `${imageURLs.length} imagem(ns) carregada(s) com sucesso.`,
-        });
-      } catch (error) {
-        toast({
-          title: "Erro ao processar imagens",
-          description: "Não foi possível processar as imagens carregadas.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
-  const removeImage = (indexToRemove: number) => {
-    setUploadedImages(uploadedImages.filter((_, index) => index !== indexToRemove));
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -340,49 +310,18 @@ export default function CreatePost() {
                   {/* Image Upload Section */}
                   <div className="space-y-4">
                     <div>
-                      <FormLabel>Imagens do Produto (até 3)</FormLabel>
+                      <FormLabel>Imagens (até 3)</FormLabel>
                       <p className="text-sm text-gray-600 mb-3">
-                        Adicione até 3 imagens para destacar melhor seu produto ou serviço.
+                        Adicione até 3 imagens. Elas serão automaticamente redimensionadas e otimizadas.
                       </p>
                     </div>
                     
-                    {/* Upload Button */}
-                    {uploadedImages.length < 3 && (
-                      <ObjectUploader
-                        maxNumberOfFiles={3 - uploadedImages.length}
-                        maxFileSize={5 * 1024 * 1024} // 5MB
-                        onGetUploadParameters={handleGetUploadParameters}
-                        onComplete={handleUploadComplete}
-                        buttonClassName="bg-primary-yellow hover:bg-primary-yellow/90 text-white"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Upload className="h-4 w-4" />
-                          <span>Adicionar Imagens</span>
-                        </div>
-                      </ObjectUploader>
-                    )}
-
-                    {/* Uploaded Images Preview */}
-                    {uploadedImages.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {uploadedImages.map((imagePath, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={imagePath}
-                              alt={`Imagem ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <ImageUploader
+                      onImagesChange={handleImagesChange}
+                      maxImages={3}
+                      currentImages={uploadedImages}
+                      disabled={createPostMutation.isPending}
+                    />
                   </div>
 
                   {/* Price (if not news) */}
@@ -466,67 +405,7 @@ export default function CreatePost() {
                     )}
                   />
 
-                  {/* User Information */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold mb-4">Suas Informações</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* User Name */}
-                      <FormField
-                        control={form.control}
-                        name="userName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Seu Nome *</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="João Silva"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
 
-                      {/* User Email */}
-                      <FormField
-                        control={form.control}
-                        name="userEmail"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Seu Email</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="email"
-                                placeholder="joao@email.com"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* User Phone */}
-                      <FormField
-                        control={form.control}
-                        name="userPhone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Seu Telefone</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="(11) 99999-0000"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
 
                   {/* Submit Button */}
                   <div className="flex space-x-4 pt-6">
