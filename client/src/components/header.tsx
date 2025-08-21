@@ -56,6 +56,18 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
               <span className="hidden md:block">Favoritos</span>
             </Button>
 
+            <Link href="/login">
+              <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white">
+                Entrar
+              </Button>
+            </Link>
+
+            <Link href="/register">
+              <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white">
+                Cadastrar
+              </Button>
+            </Link>
+
             <Link href="/postar-anuncios">
               <Button className="bg-primary-yellow text-white hover:bg-primary-yellow font-medium">
                 Postar
