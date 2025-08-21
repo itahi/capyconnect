@@ -14,7 +14,7 @@ import { Eye, EyeOff, UserPlus } from "lucide-react";
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [, setLocation] = useLocation();
-  const { register, isRegistering } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<RegisterData>({
@@ -29,19 +29,34 @@ export default function Register() {
   });
 
   const onSubmit = async (data: RegisterData) => {
+    setIsLoading(true);
     try {
-      await register(data);
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao CapyConnect. Você já está logado.",
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
-      setLocation("/");
+
+      if (response.ok) {
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Bem-vindo ao CapyConnect. Você já está logado.",
+        });
+        setLocation("/");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao criar conta');
+      }
     } catch (error: any) {
       toast({
         title: "Erro ao criar conta",
         description: error.message || "Ocorreu um erro ao criar sua conta. Tente novamente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -77,7 +92,7 @@ export default function Register() {
                         <Input
                           placeholder="Seu nome completo"
                           {...field}
-                          disabled={isRegistering}
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
@@ -96,7 +111,7 @@ export default function Register() {
                           type="email"
                           placeholder="seu@email.com"
                           {...field}
-                          disabled={isRegistering}
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
@@ -116,7 +131,7 @@ export default function Register() {
                             type={showPassword ? "text" : "password"}
                             placeholder="Mínimo 6 caracteres"
                             {...field}
-                            disabled={isRegistering}
+                            disabled={isLoading}
                           />
                           <button
                             type="button"
@@ -146,7 +161,7 @@ export default function Register() {
                         <Input
                           placeholder="(11) 99999-9999"
                           {...field}
-                          disabled={isRegistering}
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
@@ -164,7 +179,7 @@ export default function Register() {
                         <Input
                           placeholder="Cidade, Estado"
                           {...field}
-                          disabled={isRegistering}
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
@@ -175,9 +190,9 @@ export default function Register() {
                 <Button
                   type="submit"
                   className="w-full bg-primary-yellow hover:bg-primary-yellow/90"
-                  disabled={isRegistering}
+                  disabled={isLoading}
                 >
-                  {isRegistering ? "Criando conta..." : "Criar conta"}
+                  {isLoading ? "Criando conta..." : "Criar conta"}
                 </Button>
 
                 <div className="text-center">

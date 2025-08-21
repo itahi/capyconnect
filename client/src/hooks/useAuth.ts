@@ -8,10 +8,11 @@ export function useAuth() {
   const { data: user, isLoading, error } = useQuery<UserProfile>({
     queryKey: ["/api/auth/user"],
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,
+    enabled: false, // Disable automatic fetching
   });
 
   const loginMutation = useMutation({

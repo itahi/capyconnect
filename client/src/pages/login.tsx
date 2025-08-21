@@ -14,7 +14,7 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [, setLocation] = useLocation();
-  const { login, isLoggingIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<LoginData>({
@@ -26,19 +26,34 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginData) => {
+    setIsLoading(true);
     try {
-      await login(data);
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao CapyConnect.",
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
-      setLocation("/");
+
+      if (response.ok) {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo de volta ao CapyConnect.",
+        });
+        setLocation("/");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro no login');
+      }
     } catch (error: any) {
       toast({
         title: "Erro no login",
         description: error.message || "Credenciais inválidas. Verifique seu email e senha.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,7 +110,7 @@ export default function Login() {
                             type={showPassword ? "text" : "password"}
                             placeholder="Sua senha"
                             {...field}
-                            disabled={isLoggingIn}
+                            disabled={isLoading}
                           />
                           <button
                             type="button"
@@ -118,9 +133,9 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full bg-primary-yellow hover:bg-primary-yellow/90"
-                  disabled={isLoggingIn}
+                  disabled={isLoading}
                 >
-                  {isLoggingIn ? "Entrando..." : "Entrar"}
+                  {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
 
                 <div className="text-center">
