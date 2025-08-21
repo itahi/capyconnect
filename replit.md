@@ -1,8 +1,8 @@
-# ServiçoHub Brasil - Marketplace Platform
+# CapyConnect - Marketplace Platform
 
 ## Overview
 
-ServiçoHub Brasil is a comprehensive Brazilian marketplace platform built as a full-stack web application. The platform allows users to post and browse services, products, news, and job opportunities. Users can include WhatsApp contact information and external links for direct communication and redirection. The application features a modern React frontend with a Node.js/Express backend, designed to provide a complete marketplace experience with purple branding.
+CapyConnect is a comprehensive Brazilian marketplace platform built as a full-stack web application. The platform allows users to post and browse services, products, news, and job opportunities. Users can include WhatsApp contact information and external links for direct communication and redirection. The application features a modern React frontend with a Node.js/Express backend, designed to provide a complete marketplace experience with purple branding.
 
 ## User Preferences
 

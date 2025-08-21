@@ -25,8 +25,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary-yellow">ServiçoHub</h1>
-              <span className="ml-2 bg-accent-yellow text-white text-xs px-2 py-1 rounded-full font-semibold">BRASIL</span>
+              <h1 className="text-2xl font-bold text-primary-yellow">CapyConnect</h1>
             </Link>
           </div>
 
@@ -56,11 +55,8 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
               <i className="fas fa-heart"></i>
               <span className="hidden md:block">Favoritos</span>
             </Button>
-            <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
-              <i className="fas fa-bell"></i>
-              <span className="hidden md:block">Alertas</span>
-            </Button>
-            <Link href="/postar">
+
+            <Link href="/postar-anuncios">
               <Button className="bg-primary-yellow text-white hover:bg-primary-yellow font-medium">
                 Postar
               </Button>
@@ -81,10 +77,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
               <Link href="/categoria/tecnologia" className="text-gray-700 hover:text-primary-yellow transition-colors">Tech Jobs</Link>
               <Link href="/categoria/economia" className="text-gray-700 hover:text-primary-yellow transition-colors">Notícias</Link>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-accent-yellow font-semibold">⭐ Destaques</span>
-              <span className="text-primary-yellow font-semibold">📱 WhatsApp Direct</span>
-            </div>
+
           </div>
         </nav>
       </div>

@@ -38,9 +38,9 @@ export default function Home() {
             <div className="lg:col-span-2">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 h-64 flex items-center">
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-4">ServiçoHub - Seu Marketplace Completo</h2>
+                  <h2 className="text-3xl font-bold mb-4">CapyConnect - Seu Marketplace Completo</h2>
                   <p className="text-xl mb-4">Serviços, Produtos, Notícias e Vagas em um só lugar</p>
-                  <Link href="/postar">
+                  <Link href="/postar-anuncios">
                     <Button className="bg-white text-primary-purple hover:bg-gray-100 font-semibold">
                       Postar Anúncio
                     </Button>
