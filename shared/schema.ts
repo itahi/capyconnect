@@ -68,6 +68,13 @@ export const likes = pgTable("likes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const favorites = pgTable("favorites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  postId: varchar("post_id").references(() => posts.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const comments = pgTable("comments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
@@ -77,13 +84,6 @@ export const comments = pgTable("comments", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const favorites = pgTable("favorites", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  postId: varchar("post_id").references(() => posts.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Relations

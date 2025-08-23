@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Category, PostWithRelations } from "@shared/schema";
 import Header from "@/components/header";
 import CategoryTabs from "@/components/category-tabs";
-import PostCard from "@/components/post-card";
+import { PostCard } from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useState } from "react";

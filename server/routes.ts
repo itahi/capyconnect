@@ -216,6 +216,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Toggle like on a post
+  app.post("/api/posts/:id/like", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId!;
+      
+      const result = await storage.toggleLike(userId, postId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      res.status(500).json({ error: "Failed to toggle like" });
+    }
+  });
+
+  // Toggle favorite on a post
+  app.post("/api/posts/:id/favorite", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId!;
+      
+      const result = await storage.toggleFavorite(userId, postId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      res.status(500).json({ error: "Failed to toggle favorite" });
+    }
+  });
+
+  // Add comment to a post
+  app.post("/api/posts/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId!;
+      const { content } = req.body;
+      
+      if (!content || content.trim() === '') {
+        return res.status(400).json({ error: "Comment content is required" });
+      }
+      
+      const comment = await storage.addComment(userId, postId, content.trim());
+      res.json(comment);
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      res.status(500).json({ error: "Failed to add comment" });
+    }
+  });
+
+  // Get comments for a post
+  app.get("/api/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const comments = await storage.getComments(postId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ error: "Failed to fetch comments" });
+    }
+  });
+
+  // Get user favorites
+  app.get("/api/user/favorites", requireAuth, async (req, res) => {
+    try {
+      const favorites = await storage.getFavorites(req.session.userId!);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
   app.get("/api/user/posts", requireAuth, async (req, res) => {
     try {
       const posts = await storage.getUserPosts(req.session.userId!);
