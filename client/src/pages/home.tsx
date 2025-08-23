@@ -29,43 +29,40 @@ export default function Home() {
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       
       {/* Hero Banner */}
-      <section className="bg-gradient-to-r from-primary-purple to-secondary-purple text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 h-64 flex items-center">
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-4">CapyConnect - Seu Marketplace Completo</h2>
-                  <p className="text-xl mb-4">Serviços, Produtos, Notícias e Vagas em um só lugar</p>
-                  <Link href="/postar-anuncios">
-                    <Button className="bg-white text-primary-purple hover:bg-gray-100 font-semibold">
-                      Postar Anúncio
-                    </Button>
-                  </Link>
-                </div>
-                <div className="flex-1 text-right">
-                  <img 
-                    src="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400" 
-                    alt="Marketplace de serviços" 
-                    className="rounded-lg shadow-lg w-full h-auto max-w-sm ml-auto"
-                  />
-                </div>
-              </div>
-            </div>
+      <section className="bg-gradient-to-r from-primary-yellow to-secondary-yellow text-white py-12">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">CapyConnect</h1>
+          <p className="text-xl md:text-2xl mb-6 opacity-90">Seu Marketplace Completo do Brasil</p>
+          <p className="text-lg mb-8 opacity-80">Serviços, Produtos, Vagas e Oportunidades em um só lugar</p>
+          
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/postar-anuncios">
+              <Button className="bg-white text-primary-yellow hover:bg-gray-100 font-semibold px-6 py-3">
+                Postar Anúncio Grátis
+              </Button>
+            </Link>
+            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-yellow px-6 py-3">
+              Explorar Categorias
+            </Button>
+          </div>
 
-            <div className="space-y-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <h3 className="font-semibold mb-2">🔧 Serviços</h3>
-                <p className="text-sm opacity-90">Encontre profissionais para qualquer necessidade</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <h3 className="font-semibold mb-2">📱 WhatsApp</h3>
-                <p className="text-sm opacity-90">Contato direto com um clique</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <h3 className="font-semibold mb-2">💼 Oportunidades</h3>
-                <p className="text-sm opacity-90">Vagas e negócios atualizados diariamente</p>
-              </div>
+          {/* Statistics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-2xl font-bold">500+</div>
+              <div className="text-sm opacity-80">Anúncios Ativos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">50+</div>
+              <div className="text-sm opacity-80">Categorias</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">1000+</div>
+              <div className="text-sm opacity-80">Usuários</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">100%</div>
+              <div className="text-sm opacity-80">Gratuito</div>
             </div>
           </div>
         </div>
@@ -87,12 +84,11 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         {/* Featured Posts Section */}
         <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              ⭐ Destaques
-              <span className="ml-3 bg-accent-purple text-white text-sm px-2 py-1 rounded-full">Especiais</span>
-            </h2>
-            <a href="#" className="text-primary-purple hover:underline">Ver todos</a>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">⭐ Anúncios em Destaque</h2>
+              <p className="text-gray-600">Os melhores anúncios selecionados para você</p>
+            </div>
           </div>
 
           {featuredLoading ? (
@@ -120,14 +116,23 @@ export default function Home() {
 
         {/* All Posts Section */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {activeTab === "all" && "Todos os Posts"}
-              {activeTab === "service" && "Serviços"}
-              {activeTab === "product" && "Produtos"}
-              {activeTab === "job" && "Vagas"}
-              {activeTab === "news" && "Notícias"}
-            </h2>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                {activeTab === "all" && "📋 Todos os Anúncios"}
+                {activeTab === "service" && "🔧 Serviços"}
+                {activeTab === "product" && "📱 Produtos"}
+                {activeTab === "job" && "💼 Vagas"}
+                {activeTab === "news" && "📰 Notícias"}
+              </h2>
+              <p className="text-gray-600">
+                {activeTab === "all" && "Explore todas as oportunidades disponíveis"}
+                {activeTab === "service" && "Encontre o profissional ideal para suas necessidades"}
+                {activeTab === "product" && "Descubra produtos incríveis com ótimos preços"}
+                {activeTab === "job" && "Oportunidades de trabalho atualizadas"}
+                {activeTab === "news" && "Fique por dentro das últimas notícias"}
+              </p>
+            </div>
           </div>
 
           {allPostsLoading ? (
@@ -152,89 +157,34 @@ export default function Home() {
             </div>
           )}
 
-          <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary-purple text-primary-purple hover:bg-primary-purple hover:text-white">
-              Carregar Mais Posts
-            </Button>
-          </div>
+          {allPosts && allPosts.length > 0 && (
+            <div className="text-center mt-12">
+              <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white px-8 py-3">
+                Carregar Mais Anúncios
+              </Button>
+            </div>
+          )}
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-primary-purple">ServiçoHub</h3>
-              <p className="text-gray-300 mb-4">O marketplace completo do Brasil. Serviços, produtos, vagas e notícias em um só lugar.</p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-primary-purple transition-colors">
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-primary-purple transition-colors">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-primary-purple transition-colors">
-                  <i className="fab fa-twitter"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-primary-purple transition-colors">
-                  <i className="fab fa-youtube"></i>
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Links Rápidos</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Como Funciona</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Postar Anúncio</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Para Empresas</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">API Desenvolvedores</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Categorias Populares</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Limpeza</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Encanamento</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Tecnologia</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Produtos</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Suporte</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Política de Privacidade</a></li>
-                <li><a href="#" className="hover:text-primary-purple transition-colors">Termos de Uso</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-sm">© 2024 ServiçoHub. Todos os direitos reservados.</p>
-              <div className="flex items-center space-x-4 mt-4 md:mt-0">
-                <span className="text-gray-400 text-sm">Baixe nosso app:</span>
-                <a href="#" className="hover:opacity-80 transition-opacity">
-                  <img 
-                    src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
-                    alt="Download na App Store" 
-                    className="h-10 w-auto"
-                  />
-                </a>
-                <a href="#" className="hover:opacity-80 transition-opacity">
-                  <img 
-                    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" 
-                    alt="Baixar no Google Play" 
-                    className="h-10 w-auto"
-                  />
-                </a>
-              </div>
-            </div>
+      {/* Simple Footer */}
+      <footer className="bg-white border-t border-gray-200 py-6 mt-16">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500 text-sm">
+            © 2024 CapyConnect - O marketplace completo do Brasil
+          </p>
+          <div className="flex justify-center items-center gap-4 mt-2 text-sm">
+            <Link href="/postar-anuncios" className="text-primary-yellow hover:underline">
+              Postar Anúncio
+            </Link>
+            <span className="text-gray-300">•</span>
+            <a href="#" className="text-gray-500 hover:text-primary-yellow">
+              Contato
+            </a>
+            <span className="text-gray-300">•</span>
+            <a href="#" className="text-gray-500 hover:text-primary-yellow">
+              Ajuda
+            </a>
           </div>
         </div>
       </footer>
