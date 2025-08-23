@@ -651,7 +651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts/:postId/like", requireAuth, async (req, res) => {
     try {
       const { postId } = req.params;
-      const userId = req.session!.userId;
+      const userId = req.session!.userId!;
 
       // Check if already liked
       const isLiked = await storage.isPostLiked(userId, postId);
@@ -671,14 +671,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error toggling like:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
+      res.status(500).json({ error: "Não foi possível curtir o post" });
     }
   });
 
   app.post("/api/posts/:postId/favorite", requireAuth, async (req, res) => {
     try {
       const { postId } = req.params;
-      const userId = req.session!.userId;
+      const userId = req.session!.userId!;
 
       // Check if already favorited
       const isFavorited = await storage.isPostFavorited(userId, postId);
@@ -694,7 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
+      res.status(500).json({ error: "Não foi possível favoritar o post" });
     }
   });
 
@@ -714,7 +714,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { postId } = req.params;
       const { content } = req.body;
-      const userId = req.session!.userId;
+      const userId = req.session!.userId!;
 
       if (!content || content.trim().length === 0) {
         return res.status(400).json({ error: "Conteúdo do comentário é obrigatório" });
@@ -737,7 +737,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/comments/:commentId", requireAuth, async (req, res) => {
     try {
       const { commentId } = req.params;
-      const userId = req.session!.userId;
+      const userId = req.session!.userId!;
 
       const deleted = await storage.deleteComment(commentId, userId);
       if (deleted) {
@@ -754,7 +754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User favorites
   app.get("/api/user/favorites", requireAuth, async (req, res) => {
     try {
-      const userId = req.session!.userId;
+      const userId = req.session!.userId!;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
