@@ -5,14 +5,13 @@ import type { UserProfile, LoginData, RegisterData } from "@shared/schema";
 export function useAuth() {
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading, error } = useQuery<UserProfile>({
+  const { data: user, isLoading, error, refetch } = useQuery<UserProfile>({
     queryKey: ["/api/auth/user"],
     retry: false,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchOnMount: false,
-    enabled: false, // Disable automatic fetching
+    refetchOnMount: true,
   });
 
   const loginMutation = useMutation({

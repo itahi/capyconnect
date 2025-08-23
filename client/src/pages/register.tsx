@@ -40,11 +40,8 @@ export default function Register() {
       });
 
       if (response.ok) {
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Bem-vindo ao CapyConnect. Você já está logado.",
-        });
-        setLocation("/");
+        // Refresh page after successful registration to update auth state
+        window.location.href = "/";
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao criar conta');

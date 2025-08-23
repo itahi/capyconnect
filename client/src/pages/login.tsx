@@ -37,11 +37,8 @@ export default function Login() {
       });
 
       if (response.ok) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo de volta ao CapyConnect.",
-        });
-        setLocation("/");
+        // Refresh auth state after successful login
+        window.location.href = "/";
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro no login');
