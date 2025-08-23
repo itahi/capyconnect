@@ -20,13 +20,19 @@ function UserActions() {
   if (isAuthenticated && user) {
     return (
       <div className="flex items-center space-x-4">
+        <Link href="/meus-anuncios">
+          <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
+            <User className="h-4 w-4" />
+            <span className="hidden md:block">Meus Anúncios</span>
+          </Button>
+        </Link>
+
         <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
           <i className="fas fa-heart"></i>
           <span className="hidden md:block">Favoritos</span>
         </Button>
 
         <div className="flex items-center space-x-2 text-gray-700">
-          <User className="h-4 w-4" />
           <span className="hidden md:block font-medium">Olá, {user.name?.split(' ')[0] || 'Usuário'}</span>
         </div>
 

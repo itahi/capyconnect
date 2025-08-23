@@ -72,7 +72,13 @@ export default function PostarAnuncios() {
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: InsertPost) => {
-      return apiRequest("POST", "/api/posts", postData);
+      return apiRequest("/api/posts", {
+        method: "POST",
+        body: JSON.stringify(postData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
@@ -96,37 +102,26 @@ export default function PostarAnuncios() {
     if (!isAuthenticated) {
       toast({
         title: "Login necessário",
-        description: "Você precisa estar logado para postar anúncios.",
+        description: "Você precisa estar logado para criar um post",
         variant: "destructive",
       });
-      setLocation("/login");
       return;
     }
 
-    try {
-      const postData: InsertPost = {
-        title: data.title,
-        description: data.description,
-        categoryId: data.categoryId,
-        imageUrls: uploadedImages.length > 0 ? uploadedImages : null,
-        price: data.price ? parseInt(data.price.replace(/\D/g, '')) : null,
-        whatsappNumber: data.whatsappNumber || null,
-        externalLink: data.externalLink || null,
-        location: data.location,
-        userId: user?.id || '',
-        isActive: true,
-        isFeatured: false,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      };
+    const priceInCents = data.price && data.price.trim() ? Math.round(parseFloat(data.price) * 100) : null;
+    
+    const postData: InsertPost = {
+      title: data.title.trim(),
+      description: data.description.trim(),
+      categoryId: data.categoryId,
+      price: priceInCents,
+      whatsappNumber: data.whatsappNumber?.trim() || null,
+      externalLink: data.externalLink?.trim() || null,
+      location: data.location.trim(),
+      imageUrls: uploadedImages.length > 0 ? uploadedImages : null,
+    };
 
-      createPostMutation.mutate(postData);
-    } catch (error) {
-      toast({
-        title: "Erro ao criar post",
-        description: "Não foi possível criar o post. Tente novamente.",
-        variant: "destructive",
-      });
-    }
+    createPostMutation.mutate(postData);
   };
 
   const getTypeInfo = (type: string) => {

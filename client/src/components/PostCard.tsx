@@ -11,18 +11,18 @@ interface Post {
   id: string;
   title: string;
   description: string;
-  price?: number;
+  price?: number | null;
   location: string;
-  whatsappNumber?: string;
-  externalLink?: string;
+  whatsappNumber?: string | null;
+  externalLink?: string | null;
   createdAt: string;
   likesCount: number;
   commentsCount: number;
-  imageUrls?: string[];
+  imageUrls?: string[] | null;
   user: {
     id: string;
     name: string;
-    avatar?: string;
+    avatar?: string | null;
   };
   category: {
     id: string;

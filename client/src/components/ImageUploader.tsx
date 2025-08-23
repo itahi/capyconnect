@@ -1,22 +1,20 @@
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, X, ImageIcon } from "lucide-react";
 
 interface ImageUploaderProps {
   onImagesChange: (imageUrls: string[]) => void;
   maxImages?: number;
-  currentImages?: string[];
-  disabled?: boolean;
+  existingImages?: string[];
 }
 
 export function ImageUploader({ 
   onImagesChange, 
   maxImages = 3, 
-  currentImages = [],
-  disabled = false 
+  existingImages = [] 
 }: ImageUploaderProps) {
-  const [images, setImages] = useState<string[]>(currentImages);
+  const [images, setImages] = useState<string[]>(existingImages);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -25,171 +23,155 @@ export function ImageUploader({
     const files = Array.from(event.target.files || []);
     
     if (files.length === 0) return;
-
-    // Check if adding these files would exceed the limit
+    
+    // Check total images limit
     if (images.length + files.length > maxImages) {
       toast({
         title: "Limite excedido",
-        description: `Você pode fazer upload de no máximo ${maxImages} imagens.`,
+        description: `Você pode enviar no máximo ${maxImages} imagens`,
         variant: "destructive",
       });
       return;
     }
 
-    // Validate file types and sizes
-    const validFiles = files.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Formato inválido",
-          description: `O arquivo ${file.name} não é uma imagem válida.`,
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      // 10MB limit
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "Arquivo muito grande",
-          description: `O arquivo ${file.name} é muito grande. Limite: 10MB.`,
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      return true;
-    });
+    // Validate file types
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+    
+    if (invalidFiles.length > 0) {
+      toast({
+        title: "Formato inválido",
+        description: "Apenas arquivos PNG, JPG, JPEG e WEBP são aceitos",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    if (validFiles.length === 0) return;
+    // Check file sizes (max 5MB each)
+    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "Cada imagem deve ter no máximo 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setUploading(true);
 
     try {
-      // Create FormData for multiple file upload
-      const formData = new FormData();
-      validFiles.forEach((file) => {
-        formData.append('images', file);
+      const uploadPromises = files.map(async (file) => {
+        // Convert to base64 for preview (simplified for demo)
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
       });
 
-      // Upload with automatic processing
-      const response = await fetch('/api/images/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const data = await response.json();
-      const newImages = [...images, ...data.imageUrls];
+      const imageUrls = await Promise.all(uploadPromises);
+      const newImages = [...images, ...imageUrls];
+      
       setImages(newImages);
       onImagesChange(newImages);
-
+      
       toast({
-        title: "Upload concluído",
-        description: data.message || `${validFiles.length} imagem(ns) enviada(s) e otimizada(s) com sucesso.`,
+        title: "Sucesso!",
+        description: `${files.length} imagem(ns) carregada(s)`,
       });
-
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         title: "Erro no upload",
-        description: "Não foi possível enviar as imagens. Tente novamente.",
+        description: "Não foi possível carregar as imagens",
         variant: "destructive",
       });
     } finally {
       setUploading(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
-  const handleRemoveImage = (index: number) => {
+  const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
     onImagesChange(newImages);
   };
 
-  const canAddMoreImages = images.length < maxImages;
-
   return (
     <div className="space-y-4">
       {/* Upload Button */}
-      {canAddMoreImages && (
-        <div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-            disabled={disabled || uploading}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={disabled || uploading}
-            className="w-full h-24 border-2 border-dashed border-gray-300 hover:border-primary-yellow hover:bg-primary-yellow/5"
-          >
-            <div className="flex flex-col items-center gap-2">
-              {uploading ? (
-                <>
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-yellow"></div>
-                  <span className="text-sm">Enviando...</span>
-                </>
-              ) : (
-                <>
-                  <Upload className="h-6 w-6 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    Clique para adicionar imagens ({images.length}/{maxImages})
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    PNG, JPG, GIF até 10MB cada
-                  </span>
-                </>
-              )}
+      <div className="flex items-center justify-center">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading || images.length >= maxImages}
+          className="w-full max-w-md h-32 border-2 border-dashed border-primary-yellow/50 hover:border-primary-yellow text-primary-yellow hover:bg-primary-yellow/5"
+          data-testid="button-upload-images"
+        >
+          <div className="text-center">
+            {uploading ? (
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-yellow mx-auto mb-2"></div>
+            ) : (
+              <Upload className="h-8 w-8 mx-auto mb-2" />
+            )}
+            <div className="text-sm">
+              {uploading ? "Carregando..." : "Clique para adicionar imagens"}
             </div>
-          </Button>
-        </div>
-      )}
+            <div className="text-xs text-gray-500 mt-1">
+              PNG, JPG, JPEG, WEBP (máx. 5MB cada)
+            </div>
+            <div className="text-xs text-gray-500">
+              {images.length}/{maxImages} imagens
+            </div>
+          </div>
+        </Button>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp"
+          multiple
+          onChange={handleFileSelect}
+          className="hidden"
+          data-testid="input-image-files"
+        />
+      </div>
 
       {/* Image Preview Grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((imageUrl, index) => (
             <div key={index} className="relative group">
-              <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+              <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200">
                 <img
                   src={imageUrl}
-                  alt={`Upload ${index + 1}`}
+                  alt={`Preview ${index + 1}`}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Fallback for broken images
-                    const target = e.target as HTMLImageElement;
-                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Cpath d='M30 70h40v-5L60 55l-10 10-15-15-5 20z' fill='%23d1d5db'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23d1d5db'/%3E%3C/svg%3E";
-                  }}
+                  data-testid={`img-preview-${index}`}
                 />
               </div>
               
-              {/* Remove button */}
-              {!disabled && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+              {/* Remove Button */}
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removeImage(index)}
+                className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                data-testid={`button-remove-image-${index}`}
+              >
+                <X className="h-3 w-3" />
+              </Button>
               
-              {/* Image number indicator */}
-              <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+              {/* Image Number */}
+              <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                 {index + 1}
               </div>
             </div>
@@ -197,12 +179,16 @@ export function ImageUploader({
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Instructions */}
       {images.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          <ImageIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <p className="text-sm">Nenhuma imagem adicionada</p>
-          <p className="text-xs">As imagens serão automaticamente redimensionadas para o tamanho padrão</p>
+        <div className="text-center py-4">
+          <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
+            Adicione até {maxImages} imagens do seu produto ou serviço
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            Imagens ajudam a atrair mais interesse no seu anúncio
+          </p>
         </div>
       )}
     </div>
