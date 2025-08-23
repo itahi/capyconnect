@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Heart, MessageCircle, ThumbsUp, MapPin, Phone, ExternalLink, Share2 } from "lucide-react";
+import { Heart, MessageCircle, ThumbsUp, MapPin, Phone, ExternalLink, Share2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,6 +43,8 @@ export function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
 
   const likeMutation = useMutation({
     mutationFn: async () => {
@@ -104,6 +107,45 @@ export function PostCard({ post }: PostCardProps) {
     },
   });
 
+  // Comments functionality
+  const { data: comments } = useQuery({
+    queryKey: [`/api/posts/${post.id}/comments`],
+    enabled: showComments,
+  });
+
+  const commentMutation = useMutation({
+    mutationFn: async (content: string) => {
+      return apiRequest(`/api/posts/${post.id}/comments`, {
+        method: "POST",
+        body: JSON.stringify({ content }),
+      });
+    },
+    onSuccess: () => {
+      setNewComment("");
+      queryClient.invalidateQueries({ queryKey: [`/api/posts/${post.id}/comments`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      toast({
+        title: "Comentário adicionado!",
+        description: "Seu comentário foi publicado com sucesso.",
+      });
+    },
+    onError: () => {
+      if (!isAuthenticated) {
+        toast({
+          title: "Login necessário",
+          description: "Faça login para comentar",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: "Não foi possível adicionar o comentário",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
   const handleLike = () => {
     if (!isAuthenticated) {
       toast({
@@ -126,6 +168,24 @@ export function PostCard({ post }: PostCardProps) {
       return;
     }
     favoriteMutation.mutate();
+  };
+
+  const handleComment = () => {
+    setShowComments(!showComments);
+  };
+
+  const handleSubmitComment = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para comentar",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (newComment.trim()) {
+      commentMutation.mutate(newComment.trim());
+    }
   };
 
   const handleWhatsApp = () => {
@@ -249,17 +309,18 @@ export function PostCard({ post }: PostCardProps) {
               <span className="text-sm">{likesCount}</span>
             </Button>
 
-            <Link href={`/post/${post.id}#comments`}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-1 text-gray-600 hover:text-green-600"
-                data-testid={`button-comments-${post.id}`}
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span className="text-sm">{post.commentsCount}</span>
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleComment}
+              className={`flex items-center space-x-1 ${
+                showComments ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+              }`}
+              data-testid={`button-comments-${post.id}`}
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="text-sm">{post.commentsCount}</span>
+            </Button>
 
             <Button
               variant="ghost"
@@ -299,6 +360,65 @@ export function PostCard({ post }: PostCardProps) {
             )}
           </div>
         </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="border-t border-gray-100 mt-4 pt-4">
+            {/* Add Comment Form */}
+            {isAuthenticated && (
+              <div className="mb-4">
+                <Textarea
+                  placeholder="Escreva um comentário..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="mb-2"
+                  rows={2}
+                />
+                <Button
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim() || commentMutation.isPending}
+                  size="sm"
+                  className="bg-primary-yellow hover:bg-secondary-yellow"
+                >
+                  <Send className="h-4 w-4 mr-1" />
+                  {commentMutation.isPending ? "Enviando..." : "Comentar"}
+                </Button>
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="space-y-3">
+              {comments && comments.length > 0 ? (
+                comments.map((comment: any) => (
+                  <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-6 h-6 bg-primary-yellow/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary-yellow font-medium text-xs">
+                          {comment.user.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="text-sm font-medium text-gray-900">
+                            {comment.user.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatDate(comment.createdAt)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  Ainda não há comentários. Seja o primeiro a comentar!
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

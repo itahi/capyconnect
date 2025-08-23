@@ -617,6 +617,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Post interactions API
+  app.post("/api/posts/:postId/like", requireAuth, async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const userId = req.session!.userId;
+
+      const result = await (storage as any).toggleLike(userId, postId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/posts/:postId/favorite", requireAuth, async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const userId = req.session!.userId;
+
+      const result = await (storage as any).toggleFavorite(userId, postId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Comments API
+  app.get("/api/posts/:postId/comments", async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const comments = await storage.getPostComments(postId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error getting comments:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/posts/:postId/comments", requireAuth, async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const { content } = req.body;
+      const userId = req.session!.userId;
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ error: "Conteúdo do comentário é obrigatório" });
+      }
+
+      const commentData: InsertComment = {
+        userId,
+        postId,
+        content: content.trim(),
+      };
+
+      const newComment = await storage.addComment(commentData);
+      res.json(newComment);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.delete("/api/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const userId = req.session!.userId;
+
+      const deleted = await storage.deleteComment(commentId, userId);
+      if (deleted) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Comentário não encontrado" });
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // User favorites
+  app.get("/api/user/favorites", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session!.userId;
+      const favorites = await storage.getUserFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error getting user favorites:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
