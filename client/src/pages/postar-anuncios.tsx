@@ -72,13 +72,7 @@ export default function PostarAnuncios() {
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: InsertPost) => {
-      return apiRequest("/api/posts", {
-        method: "POST",
-        body: JSON.stringify(postData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return apiRequest("POST", "/api/posts", postData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });

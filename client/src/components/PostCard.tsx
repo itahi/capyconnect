@@ -48,9 +48,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const likeMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/posts/${post.id}/like`, {
-        method: "POST",
-      });
+      return apiRequest("POST", `/api/posts/${post.id}/like`);
     },
     onSuccess: (data: any) => {
       setIsLiked(data.liked);
@@ -76,9 +74,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const favoriteMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/posts/${post.id}/favorite`, {
-        method: "POST",
-      });
+      return apiRequest("POST", `/api/posts/${post.id}/favorite`);
     },
     onSuccess: (data: any) => {
       setIsFavorited(data.favorited);
@@ -113,13 +109,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const commentMutation = useMutation({
     mutationFn: async (content: string) => {
-      return apiRequest(`/api/posts/${post.id}/comments`, {
-        method: "POST",
-        body: JSON.stringify({ content }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return apiRequest("POST", `/api/posts/${post.id}/comments`, { content });
     },
     onSuccess: () => {
       setNewComment("");
