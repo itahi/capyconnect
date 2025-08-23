@@ -28,57 +28,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       
-      {/* Hero Banner */}
-      <section className="bg-gradient-to-r from-primary-yellow to-secondary-yellow text-white py-12">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">CapyConnect</h1>
-          <p className="text-xl md:text-2xl mb-6 opacity-90">Seu Marketplace Completo do Brasil</p>
-          <p className="text-lg mb-8 opacity-80">Serviços, Produtos, Vagas e Oportunidades em um só lugar</p>
-          
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/postar-anuncios">
-              <Button className="bg-white text-primary-yellow hover:bg-gray-100 font-semibold px-6 py-3">
-                Postar Anúncio Grátis
-              </Button>
-            </Link>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-yellow px-6 py-3">
-              Explorar Categorias
-            </Button>
-          </div>
 
-          {/* Statistics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-2xl font-bold">500+</div>
-              <div className="text-sm opacity-80">Anúncios Ativos</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">50+</div>
-              <div className="text-sm opacity-80">Categorias</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">1000+</div>
-              <div className="text-sm opacity-80">Usuários</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">100%</div>
-              <div className="text-sm opacity-80">Gratuito</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Tabs */}
-      <section className="bg-white shadow-sm">
-        <div className="container mx-auto px-4">
-          <CategoryTabs 
-            categories={categories} 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-            isLoading={categoriesLoading}
-          />
-        </div>
-      </section>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
