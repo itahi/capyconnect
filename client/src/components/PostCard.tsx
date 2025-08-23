@@ -48,10 +48,9 @@ export function PostCard({ post }: PostCardProps) {
 
   const likeMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest(`/api/posts/${post.id}/like`, {
+      return apiRequest(`/api/posts/${post.id}/like`, {
         method: "POST",
       });
-      return response;
     },
     onSuccess: (data: any) => {
       setIsLiked(data.liked);
@@ -77,10 +76,9 @@ export function PostCard({ post }: PostCardProps) {
 
   const favoriteMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest(`/api/posts/${post.id}/favorite`, {
+      return apiRequest(`/api/posts/${post.id}/favorite`, {
         method: "POST",
       });
-      return response;
     },
     onSuccess: (data: any) => {
       setIsFavorited(data.favorited);
@@ -118,6 +116,9 @@ export function PostCard({ post }: PostCardProps) {
       return apiRequest(`/api/posts/${post.id}/comments`, {
         method: "POST",
         body: JSON.stringify({ content }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
     },
     onSuccess: () => {
@@ -351,7 +352,7 @@ export function PostCard({ post }: PostCardProps) {
                 size="sm"
                 variant="outline"
                 className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white flex items-center space-x-1"
-                onClick={() => window.open(post.externalLink, '_blank')}
+                onClick={() => window.open(post.externalLink || '', '_blank')}
                 data-testid={`button-external-${post.id}`}
               >
                 <ExternalLink className="h-4 w-4" />
@@ -388,7 +389,7 @@ export function PostCard({ post }: PostCardProps) {
 
             {/* Comments List */}
             <div className="space-y-3">
-              {comments && comments.length > 0 ? (
+              {comments && Array.isArray(comments) && comments.length > 0 ? (
                 comments.map((comment: any) => (
                   <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-start space-x-2">

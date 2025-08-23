@@ -259,8 +259,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const postId = req.params.id;
       const userId = req.session!.userId!;
       
-      const result = await storage.toggleLike(userId, postId);
-      res.json(result);
+      // Check if already liked
+      const isLiked = await storage.isPostLiked(userId, postId);
+      
+      if (isLiked) {
+        await storage.unlikePost(userId, postId);
+      } else {
+        await storage.likePost(userId, postId);
+      }
+      
+      // Get updated post to return current like count
+      const post = await storage.getPostById(postId);
+      
+      res.json({
+        liked: !isLiked,
+        likesCount: post?.likesCount || 0
+      });
     } catch (error) {
       console.error("Error toggling like:", error);
       res.status(500).json({ error: "Failed to toggle like" });
@@ -273,8 +287,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const postId = req.params.id;
       const userId = req.session!.userId!;
       
-      const result = await storage.toggleFavorite(userId, postId);
-      res.json(result);
+      // Check if already favorited
+      const isFavorited = await storage.isPostFavorited(userId, postId);
+      
+      if (isFavorited) {
+        await storage.removeFromFavorites(userId, postId);
+      } else {
+        await storage.addToFavorites(userId, postId);
+      }
+      
+      res.json({
+        favorited: !isFavorited
+      });
     } catch (error) {
       console.error("Error toggling favorite:", error);
       res.status(500).json({ error: "Failed to toggle favorite" });
@@ -292,7 +316,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Comment content is required" });
       }
       
-      const comment = await storage.addComment(userId, postId, content.trim());
+      const commentData = {
+        userId,
+        postId,
+        content: content.trim()
+      };
+      
+      const comment = await storage.addComment(commentData);
       res.json(comment);
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -304,7 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {
       const postId = req.params.id;
-      const comments = await storage.getComments(postId);
+      const comments = await storage.getPostComments(postId);
       res.json(comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -315,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user favorites
   app.get("/api/user/favorites", requireAuth, async (req, res) => {
     try {
-      const favorites = await storage.getFavorites(req.session.userId!);
+      const favorites = await storage.getUserFavorites(req.session.userId!);
       res.json(favorites);
     } catch (error) {
       console.error("Error fetching favorites:", error);
@@ -623,8 +653,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { postId } = req.params;
       const userId = req.session!.userId;
 
-      const result = await (storage as any).toggleLike(userId, postId);
-      res.json(result);
+      // Check if already liked
+      const isLiked = await storage.isPostLiked(userId, postId);
+      
+      if (isLiked) {
+        await storage.unlikePost(userId, postId);
+      } else {
+        await storage.likePost(userId, postId);
+      }
+      
+      // Get updated post to return current like count
+      const post = await storage.getPostById(postId);
+      
+      res.json({
+        liked: !isLiked,
+        likesCount: post?.likesCount || 0
+      });
     } catch (error) {
       console.error("Error toggling like:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -636,8 +680,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { postId } = req.params;
       const userId = req.session!.userId;
 
-      const result = await (storage as any).toggleFavorite(userId, postId);
-      res.json(result);
+      // Check if already favorited
+      const isFavorited = await storage.isPostFavorited(userId, postId);
+      
+      if (isFavorited) {
+        await storage.removeFromFavorites(userId, postId);
+      } else {
+        await storage.addToFavorites(userId, postId);
+      }
+      
+      res.json({
+        favorited: !isFavorited
+      });
     } catch (error) {
       console.error("Error toggling favorite:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -666,7 +720,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Conteúdo do comentário é obrigatório" });
       }
 
-      const commentData: InsertComment = {
+      const commentData = {
         userId,
         postId,
         content: content.trim(),
