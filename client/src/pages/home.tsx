@@ -16,15 +16,12 @@ export default function Home() {
   });
 
   const { data: featuredPosts, isLoading: featuredLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts", { isFeatured: true, limit: 6 }],
+    queryKey: ["/api/posts", "featured"],
+    queryFn: () => fetch("/api/posts?isFeatured=true&limit=6").then(res => res.json()),
   });
 
   const { data: allPosts, isLoading: allPostsLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts", { 
-      limit: 12, 
-      search: searchQuery,
-      type: activeTab !== "all" ? activeTab : undefined
-    }],
+    queryKey: ["/api/posts"],
   });
 
   return (

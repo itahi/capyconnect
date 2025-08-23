@@ -12,7 +12,7 @@ interface Post {
   title: string;
   description: string;
   price?: number | null;
-  location: string;
+  location: string | null;
   whatsappNumber?: string | null;
   externalLink?: string | null;
   createdAt: string;
@@ -209,10 +209,12 @@ export function PostCard({ post }: PostCardProps) {
         </p>
 
         {/* Location */}
-        <div className="flex items-center text-gray-500 text-sm mb-3">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span>{post.location}</span>
-        </div>
+        {post.location && (
+          <div className="flex items-center text-gray-500 text-sm mb-3">
+            <MapPin className="h-4 w-4 mr-1" />
+            <span>{post.location}</span>
+          </div>
+        )}
 
         {/* User Info */}
         <div className="flex items-center justify-between mb-3">
