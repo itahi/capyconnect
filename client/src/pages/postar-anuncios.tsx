@@ -389,22 +389,7 @@ export default function PostarAnuncios() {
                   />
 
                   {/* Image Upload Section */}
-                  <div className="space-y-4">
-                    <div>
-                      <FormLabel>Imagens (opcional - até 3)</FormLabel>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Adicione imagens para tornar seu anúncio mais atrativo. Elas serão automaticamente redimensionadas.
-                      </p>
-                    </div>
-                    
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                      <div className="space-y-2">
-                        <i className="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-                        <p className="text-gray-500">Clique para adicionar imagens ou arraste e solte aqui</p>
-                        <p className="text-sm text-gray-400">PNG, JPG até 5MB cada</p>
-                      </div>
-                    </div>
-                  </div>
+                  <ImageUploader onImagesChange={handleImagesChange} maxImages={8} />
 
                   {/* Submit Button */}
                   <div className="flex space-x-4 pt-6">

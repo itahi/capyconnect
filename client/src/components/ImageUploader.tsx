@@ -1,21 +1,18 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, ImageIcon } from "lucide-react";
 
 interface ImageUploaderProps {
   onImagesChange: (imageUrls: string[]) => void;
   maxImages?: number;
-  existingImages?: string[];
+  className?: string;
 }
 
-export function ImageUploader({ 
-  onImagesChange, 
-  maxImages = 3, 
-  existingImages = [] 
-}: ImageUploaderProps) {
-  const [images, setImages] = useState<string[]>(existingImages);
-  const [uploading, setUploading] = useState(false);
+export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }: ImageUploaderProps) {
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -23,173 +20,268 @@ export function ImageUploader({
     const files = Array.from(event.target.files || []);
     
     if (files.length === 0) return;
-    
-    // Check total images limit
-    if (images.length + files.length > maxImages) {
+
+    // Check if adding these files would exceed max images
+    if (uploadedImages.length + files.length > maxImages) {
       toast({
-        title: "Limite excedido",
-        description: `Você pode enviar no máximo ${maxImages} imagens`,
+        title: "Muitas imagens",
+        description: `Você pode adicionar no máximo ${maxImages} imagens`,
         variant: "destructive",
       });
       return;
     }
 
-    // Validate file types
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
-    
-    if (invalidFiles.length > 0) {
-      toast({
-        title: "Formato inválido",
-        description: "Apenas arquivos PNG, JPG, JPEG e WEBP são aceitos",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Check file sizes (max 5MB each)
-    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: "Arquivo muito grande",
-        description: "Cada imagem deve ter no máximo 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setUploading(true);
+    setIsUploading(true);
 
     try {
-      const uploadPromises = files.map(async (file) => {
-        // Convert to base64 for preview (simplified for demo)
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
-      });
+      const newImageUrls: string[] = [];
 
-      const imageUrls = await Promise.all(uploadPromises);
-      const newImages = [...images, ...imageUrls];
-      
-      setImages(newImages);
-      onImagesChange(newImages);
-      
-      toast({
-        title: "Sucesso!",
-        description: `${files.length} imagem(ns) carregada(s)`,
-      });
+      for (const file of files) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: "Arquivo inválido",
+            description: `${file.name} não é uma imagem válida`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: "Arquivo muito grande",
+            description: `${file.name} excede o limite de 10MB`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Get upload URL from server
+        const uploadResponse = await fetch('/api/images/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Falha ao obter URL de upload');
+        }
+
+        const { uploadURL, imageId } = await uploadResponse.json();
+
+        // Process image in browser before upload (basic resize)
+        const processedFile = await processImageFile(file);
+
+        // Upload to object storage
+        const uploadResult = await fetch(uploadURL, {
+          method: 'PUT',
+          body: processedFile,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+
+        if (!uploadResult.ok) {
+          throw new Error('Falha no upload da imagem');
+        }
+
+        // The processed image URL for display
+        const imageUrl = `/api/images/${imageId}`;
+        newImageUrls.push(imageUrl);
+      }
+
+      const updatedImages = [...uploadedImages, ...newImageUrls];
+      setUploadedImages(updatedImages);
+      onImagesChange(updatedImages);
+
+      if (newImageUrls.length > 0) {
+        toast({
+          title: "Upload concluído!",
+          description: `${newImageUrls.length} imagem(s) carregada(s) com sucesso`,
+        });
+      }
+
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error('Upload error:', error);
       toast({
         title: "Erro no upload",
-        description: "Não foi possível carregar as imagens",
+        description: "Ocorreu um erro ao fazer upload das imagens",
         variant: "destructive",
       });
     } finally {
-      setUploading(false);
+      setIsUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
-  const removeImage = (index: number) => {
-    const newImages = images.filter((_, i) => i !== index);
-    setImages(newImages);
-    onImagesChange(newImages);
+  const processImageFile = async (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+
+      img.onload = () => {
+        // Mercado Livre style dimensions
+        const maxWidth = 1200;
+        const maxHeight = 900;
+        
+        let { width, height } = img;
+
+        // Calculate new dimensions maintaining aspect ratio
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(
+          (blob) => {
+            const processedFile = new File([blob!], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(processedFile);
+          },
+          'image/jpeg',
+          0.85 // Quality similar to Mercado Livre
+        );
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    const updatedImages = uploadedImages.filter((_, index) => index !== indexToRemove);
+    setUploadedImages(updatedImages);
+    onImagesChange(updatedImages);
+  };
+
+  const openFileSelector = () => {
+    fileInputRef.current?.click();
   };
 
   return (
-    <div className="space-y-4">
-      {/* Upload Button */}
-      <div className="flex items-center justify-center">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading || images.length >= maxImages}
-          className="w-full max-w-md h-32 border-2 border-dashed border-primary-yellow/50 hover:border-primary-yellow text-primary-yellow hover:bg-primary-yellow/5"
-          data-testid="button-upload-images"
-        >
-          <div className="text-center">
-            {uploading ? (
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-yellow mx-auto mb-2"></div>
-            ) : (
-              <Upload className="h-8 w-8 mx-auto mb-2" />
-            )}
-            <div className="text-sm">
-              {uploading ? "Carregando..." : "Clique para adicionar imagens"}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              PNG, JPG, JPEG, WEBP (máx. 5MB cada)
-            </div>
-            <div className="text-xs text-gray-500">
-              {images.length}/{maxImages} imagens
-            </div>
-          </div>
-        </Button>
-        
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/jpg,image/webp"
-          multiple
-          onChange={handleFileSelect}
-          className="hidden"
-          data-testid="input-image-files"
-        />
+    <div className={`space-y-4 ${className}`}>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium text-gray-900">Imagens do Anúncio</h3>
+        <span className="text-sm text-gray-500">
+          {uploadedImages.length} de {maxImages} imagens
+        </span>
       </div>
 
+      {/* Upload Area */}
+      <Card className="border-2 border-dashed border-gray-300 hover:border-primary-yellow transition-colors">
+        <CardContent className="p-6">
+          <div className="text-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={openFileSelector}
+              disabled={isUploading || uploadedImages.length >= maxImages}
+              className="mb-4"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {isUploading ? 'Fazendo upload...' : 'Adicionar Imagens'}
+            </Button>
+            
+            <p className="text-sm text-gray-600 mb-2">
+              Clique para selecionar imagens ou arraste aqui
+            </p>
+            <p className="text-xs text-gray-500">
+              Formatos aceitos: JPG, PNG, WebP • Máximo 10MB por imagem
+              <br />
+              As imagens serão redimensionadas automaticamente para otimizar a visualização
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileSelect}
+        className="hidden"
+        data-testid="file-input"
+      />
+
       {/* Image Preview Grid */}
-      {images.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {images.map((imageUrl, index) => (
+      {uploadedImages.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {uploadedImages.map((imageUrl, index) => (
             <div key={index} className="relative group">
-              <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200">
-                <img
-                  src={imageUrl}
-                  alt={`Preview ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  data-testid={`img-preview-${index}`}
-                />
-              </div>
-              
-              {/* Remove Button */}
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                data-testid={`button-remove-image-${index}`}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-              
-              {/* Image Number */}
-              <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                {index + 1}
-              </div>
+              <Card className="overflow-hidden">
+                <div className="aspect-square relative bg-gray-100">
+                  <img
+                    src={imageUrl}
+                    alt={`Upload ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y3ZjdmNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlbTwvdGV4dD48L3N2Zz4=';
+                    }}
+                  />
+                  
+                  {/* Remove button */}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removeImage(index)}
+                    data-testid={`remove-image-${index}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+
+                  {/* Image number badge */}
+                  <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                    {index + 1}
+                  </div>
+                </div>
+              </Card>
             </div>
           ))}
         </div>
       )}
 
-      {/* Instructions */}
-      {images.length === 0 && (
-        <div className="text-center py-4">
-          <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">
-            Adicione até {maxImages} imagens do seu produto ou serviço
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Imagens ajudam a atrair mais interesse no seu anúncio
-          </p>
-        </div>
+      {/* Tips */}
+      {uploadedImages.length === 0 && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-start space-x-3">
+              <ImageIcon className="h-5 w-5 text-blue-500 mt-0.5" />
+              <div className="text-sm text-blue-700">
+                <p className="font-medium mb-1">Dicas para melhores fotos:</p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Use boa iluminação natural</li>
+                  <li>• Tire fotos de diferentes ângulos</li>
+                  <li>• A primeira imagem será a capa do anúncio</li>
+                  <li>• Imagens nítidas vendem mais</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

@@ -120,6 +120,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image upload routes
+  app.post("/api/images/upload", requireAuth, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      
+      // Generate unique image ID
+      const imageId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      res.json({ 
+        uploadURL,
+        imageId
+      });
+    } catch (error) {
+      console.error("Get upload URL error:", error);
+      res.status(500).json({ error: "Failed to generate upload URL" });
+    }
+  });
+
+  app.get("/api/images/:imageId", async (req, res) => {
+    try {
+      const { imageId } = req.params;
+      const objectPath = `/objects/uploads/${imageId}`;
+      
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
+      
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Get image error:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+      res.status(500).json({ error: "Failed to get image" });
+    }
+  });
+
   // Posts
   app.get("/api/posts", optionalAuth, async (req, res) => {
     try {
