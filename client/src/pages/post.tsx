@@ -330,7 +330,7 @@ export default function PostPage() {
                   data-testid="button-whatsapp"
                 >
                   <Phone className="h-5 w-5" />
-                  WhatsApp
+                  Entrar em contato
                 </Button>
               )}
               
@@ -339,11 +339,11 @@ export default function PostPage() {
                 <Button
                   onClick={handleExternalLink}
                   variant="outline"
-                  className="flex-1 flex items-center justify-center gap-2"
+                  className="flex-1 flex items-center justify-center gap-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white"
                   data-testid="button-visit"
                 >
                   <ExternalLink className="h-5 w-5" />
-                  Visitar
+                  Ir para página
                 </Button>
               )}
             </div>

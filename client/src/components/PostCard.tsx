@@ -347,33 +347,16 @@ export function PostCard({ post }: PostCardProps) {
             </Button>
           </div>
 
-          {/* Contact Actions */}
-          <div className="flex items-center space-x-2">
-            {post.whatsappNumber && (
-              <Button
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center space-x-1"
-                onClick={handleWhatsApp}
-                data-testid={`button-whatsapp-${post.id}`}
-              >
-                <Phone className="h-4 w-4" />
-                <span className="hidden sm:inline">WhatsApp</span>
-              </Button>
-            )}
-
-            {post.externalLink && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white flex items-center space-x-1"
-                onClick={() => window.open(post.externalLink || '', '_blank')}
-                data-testid={`button-external-${post.id}`}
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">Ver mais</span>
-              </Button>
-            )}
-          </div>
+          {/* Ver mais button - directs to individual post page */}
+          <Link href={`/post/${post.id}`}>
+            <Button
+              size="sm"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white"
+              data-testid={`button-view-post-${post.id}`}
+            >
+              Ver anúncio
+            </Button>
+          </Link>
         </div>
 
         {/* Comments Section */}
