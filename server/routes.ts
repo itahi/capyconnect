@@ -647,6 +647,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get like status for a post
+  app.get("/api/posts/:postId/like-status", requireAuth, async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const userId = req.session!.userId!;
+
+      const liked = await storage.isPostLiked(userId, postId);
+      res.json({ liked });
+    } catch (error) {
+      console.error("Error getting like status:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Post interactions API
   app.post("/api/posts/:postId/like", requireAuth, async (req, res) => {
     try {

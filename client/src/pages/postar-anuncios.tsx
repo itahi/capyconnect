@@ -383,7 +383,44 @@ export default function PostarAnuncios() {
                   />
 
                   {/* Image Upload Section */}
-                  <ImageUploader onImagesChange={handleImagesChange} maxImages={8} />
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-3">📸 Fotos do anúncio</h3>
+                      <ImageUploader onImagesChange={handleImagesChange} maxImages={8} />
+                    </div>
+                    
+                    {/* Preview das imagens */}
+                    {uploadedImages.length > 0 && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="text-md font-medium text-gray-800 mb-3">Pré-visualização das imagens</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {uploadedImages.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={imageUrl.startsWith('/api/images/') ? imageUrl : `/api/images/${imageUrl.split('/').pop()}`}
+                                alt={`Pré-visualização ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                                onError={(e) => {
+                                  console.error(`Erro ao carregar imagem ${index + 1}:`, imageUrl);
+                                  const target = e.currentTarget;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                                <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-medium">
+                                  Imagem {index + 1}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-3 flex items-center gap-2">
+                          <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                          {uploadedImages.length} imagem{uploadedImages.length !== 1 ? 's' : ''} pronta{uploadedImages.length !== 1 ? 's' : ''} para publicação
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Submit Button */}
                   <div className="flex space-x-4 pt-6">

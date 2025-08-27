@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Heart, MessageCircle, ThumbsUp, MapPin, Phone, ExternalLink, Share2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
@@ -45,6 +45,11 @@ export function PostCard({ post }: PostCardProps) {
   const [likesCount, setLikesCount] = useState(post.likesCount);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+
+  // Simplify like system - track state locally and sync with server
+  useEffect(() => {
+    setLikesCount(post.likesCount);
+  }, [post.likesCount]);
 
   const likeMutation = useMutation({
     mutationFn: async () => {
