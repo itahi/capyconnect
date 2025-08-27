@@ -16,7 +16,7 @@ interface Post {
   location: string | null;
   whatsappNumber?: string | null;
   externalLink?: string | null;
-  createdAt: string;
+  createdAt: string | Date;
   likesCount: number;
   commentsCount: number;
   imageUrls?: string[] | null;
@@ -194,8 +194,8 @@ export function PostCard({ post }: PostCardProps) {
     }).format(price / 100);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: string | Date) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
@@ -209,10 +209,34 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       {/* Post Image */}
-      <div className="h-48 bg-gradient-to-br from-primary-yellow/20 to-secondary-yellow/20 relative">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <i className={`${post.category.icon} text-4xl text-primary-yellow/60`}></i>
-        </div>
+      <div className="h-48 relative overflow-hidden">
+        {post.imageUrls && post.imageUrls.length > 0 ? (
+          <>
+            <img
+              src={post.imageUrls[0]}
+              alt={post.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to category icon if image fails to load
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling;
+                if (fallback) fallback.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden absolute inset-0 bg-gradient-to-br from-primary-yellow/20 to-secondary-yellow/20 flex items-center justify-center">
+              <i className={`${post.category.icon} text-4xl text-primary-yellow/60`}></i>
+            </div>
+            {post.imageUrls.length > 1 && (
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                +{post.imageUrls.length - 1} fotos
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-yellow/20 to-secondary-yellow/20 flex items-center justify-center">
+            <i className={`${post.category.icon} text-4xl text-primary-yellow/60`}></i>
+          </div>
+        )}
         
         {/* Favorite Button */}
         <Button
