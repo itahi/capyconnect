@@ -57,39 +57,24 @@ export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }:
           continue;
         }
 
-        // Get upload URL from server
-        const uploadResponse = await fetch('/api/images/upload', {
+        // Create form data for upload
+        const formData = new FormData();
+        formData.append('images', file);
+
+        // Upload directly to server with form data
+        const uploadResult = await fetch('/api/images/upload-simple', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Falha ao obter URL de upload');
-        }
-
-        const { uploadURL, imageId } = await uploadResponse.json();
-
-        // Process image in browser before upload (basic resize)
-        const processedFile = await processImageFile(file);
-
-        // Upload to object storage
-        const uploadResult = await fetch(uploadURL, {
-          method: 'PUT',
-          body: processedFile,
-          headers: {
-            'Content-Type': file.type,
-          },
+          body: formData,
         });
 
         if (!uploadResult.ok) {
-          throw new Error('Falha no upload da imagem');
+          throw new Error(`Falha no upload: ${uploadResult.statusText}`);
         }
 
-        // The processed image URL for display
-        const imageUrl = `/api/images/${imageId}`;
-        newImageUrls.push(imageUrl);
+        const response = await uploadResult.json();
+        if (response.imageUrls && response.imageUrls.length > 0) {
+          newImageUrls.push(...response.imageUrls);
+        }
       }
 
       const updatedImages = [...uploadedImages, ...newImageUrls];

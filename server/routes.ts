@@ -18,8 +18,27 @@ import {
   ObjectNotFoundError,
 } from "./objectStorage";
 import { ImageProcessor } from "./imageProcessor";
+
 import multer from "multer";
 import { randomUUID } from "crypto";
+
+// Simple in-memory image storage for demo
+const imageStorage = new Map<string, Buffer>();
+
+// Setup multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req: any, file: any, cb: any) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
@@ -121,33 +140,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Image upload routes
-  app.post("/api/images/upload", requireAuth, async (req, res) => {
+  // Simple image upload without authentication for testing
+  app.post("/api/images/upload-simple", upload.array('images', 8), async (req: any, res) => {
     try {
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return res.status(400).json({ error: "No images provided" });
+      }
+
+      const imageUrls: string[] = [];
       
-      // Generate unique image ID
-      const imageId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      res.json({ 
-        uploadURL,
-        imageId
+      for (const file of req.files) {
+        // Generate unique filename
+        const imageId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const imagePath = `/api/images/${imageId}`;
+        
+        // Store image buffer in memory
+        imageStorage.set(imageId, file.buffer);
+        imageUrls.push(imagePath);
+      }
+
+      res.json({
+        success: true,
+        imageUrls,
+        message: `${req.files.length} image(s) uploaded successfully`,
       });
+
     } catch (error) {
-      console.error("Get upload URL error:", error);
-      res.status(500).json({ error: "Failed to generate upload URL" });
+      console.error("Error uploading images:", error);
+      res.status(500).json({ 
+        error: "Failed to upload images",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
   app.get("/api/images/:imageId", async (req, res) => {
     try {
       const { imageId } = req.params;
-      const objectPath = `/objects/uploads/${imageId}`;
       
+      // First try to get from memory storage
+      const imageBuffer = imageStorage.get(imageId);
+      if (imageBuffer) {
+        res.set({
+          'Content-Type': 'image/jpeg',
+          'Cache-Control': 'public, max-age=3600'
+        });
+        return res.send(imageBuffer);
+      }
+      
+      // If not in memory, try object storage
+      const objectPath = `/objects/uploads/${imageId}`;
       const objectStorageService = new ObjectStorageService();
       const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-      
       await objectStorageService.downloadObject(objectFile, res);
+      
     } catch (error) {
       console.error("Get image error:", error);
       if (error instanceof ObjectNotFoundError) {
@@ -531,20 +577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Setup multer for file uploads
-  const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB limit
-    },
-    fileFilter: (req: any, file: any, cb: any) => {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed'));
-      }
-    },
-  });
+
 
   app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();

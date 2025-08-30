@@ -222,6 +222,7 @@ export function PostCard({ post }: PostCardProps) {
               alt={post.title}
               className="w-full h-full object-cover"
               onError={(e) => {
+                console.error(`Erro ao carregar imagem: ${post.imageUrls![0]}`);
                 // Fallback to category icon if image fails to load
                 e.currentTarget.style.display = 'none';
                 const fallback = e.currentTarget.nextElementSibling;

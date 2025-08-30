@@ -397,7 +397,7 @@ export default function PostarAnuncios() {
                           {uploadedImages.map((imageUrl, index) => (
                             <div key={index} className="relative group">
                               <img
-                                src={imageUrl.startsWith('/api/images/') ? imageUrl : `/api/images/${imageUrl.split('/').pop()}`}
+                                src={imageUrl}
                                 alt={`Pré-visualização ${index + 1}`}
                                 className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
                                 onError={(e) => {
