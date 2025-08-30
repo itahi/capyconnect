@@ -292,8 +292,14 @@ export default function PostarAnuncios() {
                             </FormControl>
                             <SelectContent>
                               {categories?.filter(cat => cat.type === selectedType).map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
-                                  <i className={category.icon}></i> {category.name}
+                                <SelectItem 
+                                  key={`category-${category.id}`} 
+                                  value={category.id}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span>{category.icon}</span>
+                                    <span>{category.name}</span>
+                                  </div>
                                 </SelectItem>
                               ))}
                             </SelectContent>
