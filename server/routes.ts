@@ -25,6 +25,32 @@ import { randomUUID } from "crypto";
 // Simple in-memory image storage for demo
 const imageStorage = new Map<string, Buffer>();
 
+// Add a demo image on startup
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+try {
+  // Load smartphone image
+  const iphoneImagePath = join(process.cwd(), 'attached_assets/generated_images/smartphone_product_photo_942e8b09.png');
+  const iphoneImageBuffer = readFileSync(iphoneImagePath);
+  imageStorage.set('exemplo_iphone', iphoneImageBuffer);
+  console.log('iPhone demo image loaded successfully, size:', iphoneImageBuffer.length, 'bytes');
+  
+  // Load headphones image
+  const headphonesImagePath = join(process.cwd(), 'attached_assets/generated_images/bluetooth_headphones_product_f60aa7b8.png');
+  const headphonesImageBuffer = readFileSync(headphonesImagePath);
+  imageStorage.set('exemplo_fone', headphonesImageBuffer);
+  console.log('Headphones demo image loaded successfully, size:', headphonesImageBuffer.length, 'bytes');
+  
+} catch (error) {
+  console.log('Could not load all demo images:', error.message);
+  // Fallback to a small demo image if the generated ones are not available
+  const demoImageBuffer = Buffer.from('/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAAQABAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+/qKKKAP/9k=', 'base64');
+  imageStorage.set('exemplo_iphone', demoImageBuffer);
+  imageStorage.set('exemplo_fone', demoImageBuffer);
+  console.log('Demo image fallback loaded for both products');
+}
+
 // Setup multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
