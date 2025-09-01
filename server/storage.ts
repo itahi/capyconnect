@@ -8,6 +8,7 @@ import {
   likes,
   comments,
   favorites,
+  boosts,
   type Category,
   type User,
   type Post,
@@ -618,6 +619,153 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
 
     return !!favorite;
+  }
+
+  // Admin functions
+  async getAllPostsForAdmin(): Promise<PostWithRelations[]> {
+    const result = await db
+      .select({
+        id: posts.id,
+        title: posts.title,
+        description: posts.description,
+        imageUrls: posts.imageUrls,
+        price: posts.price,
+        whatsappNumber: posts.whatsappNumber,
+        externalLink: posts.externalLink,
+        location: posts.location,
+        isActive: posts.isActive,
+        isFeatured: posts.isFeatured,
+        viewCount: posts.viewCount,
+        contactCount: posts.contactCount,
+        likesCount: posts.likesCount,
+        commentsCount: posts.commentsCount,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        expiresAt: posts.expiresAt,
+        categoryId: posts.categoryId,
+        userId: posts.userId,
+        category: categories,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          phone: users.phone,
+          whatsapp: users.whatsapp,
+          location: users.location,
+          avatar: users.avatar,
+          isVerified: users.isVerified,
+          isAdmin: users.isAdmin,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+      })
+      .from(posts)
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .leftJoin(users, eq(posts.userId, users.id))
+      .orderBy(desc(posts.createdAt));
+
+    return result as PostWithRelations[];
+  }
+
+  async getAdminStats(): Promise<{
+    totalPosts: number;
+    activePosts: number;
+    totalUsers: number;
+    featuredPosts: number;
+  }> {
+    const [totalPosts] = await db.select({ count: sql<number>`count(*)` }).from(posts);
+    const [activePosts] = await db.select({ count: sql<number>`count(*)` }).from(posts).where(eq(posts.isActive, true));
+    const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(users);
+    const [featuredPosts] = await db.select({ count: sql<number>`count(*)` }).from(posts).where(eq(posts.isFeatured, true));
+
+    return {
+      totalPosts: totalPosts.count,
+      activePosts: activePosts.count,
+      totalUsers: totalUsers.count,
+      featuredPosts: featuredPosts.count,
+    };
+  }
+
+  async updatePostStatus(id: string, isActive: boolean): Promise<void> {
+    await db
+      .update(posts)
+      .set({ isActive, updatedAt: new Date() })
+      .where(eq(posts.id, id));
+  }
+
+  async updatePostFeatured(id: string, isFeatured: boolean): Promise<void> {
+    await db
+      .update(posts)
+      .set({ isFeatured, updatedAt: new Date() })
+      .where(eq(posts.id, id));
+  }
+
+  async deletePostAdmin(id: string): Promise<void> {
+    // Delete related records first
+    await db.delete(likes).where(eq(likes.postId, id));
+    await db.delete(favorites).where(eq(favorites.postId, id));
+    await db.delete(comments).where(eq(comments.postId, id));
+    await db.delete(boosts).where(eq(boosts.postId, id));
+    
+    // Delete the post
+    await db.delete(posts).where(eq(posts.id, id));
+  }
+
+  // Boost functions
+  async getPostBoosts(postId: string): Promise<any[]> {
+    const result = await db
+      .select()
+      .from(boosts)
+      .where(eq(boosts.postId, postId))
+      .orderBy(desc(boosts.createdAt));
+
+    return result;
+  }
+
+  async getActivePostBoosts(postId: string): Promise<any[]> {
+    const result = await db
+      .select()
+      .from(boosts)
+      .where(
+        and(
+          eq(boosts.postId, postId),
+          eq(boosts.isActive, true),
+          sql`${boosts.expiresAt} > NOW()`
+        )
+      );
+
+    return result;
+  }
+
+  async createPostBoost(postId: string, planId: string, userId: string): Promise<any> {
+    const plans = {
+      basic: { multiplier: 2, duration: 3, price: 1500 },
+      premium: { multiplier: 5, duration: 7, price: 3500 },
+      pro: { multiplier: 3, duration: 15, price: 6000 },
+    };
+
+    const plan = plans[planId as keyof typeof plans];
+    if (!plan) {
+      throw new Error("Invalid plan");
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + plan.duration);
+
+    const [boost] = await db
+      .insert(boosts)
+      .values({
+        postId,
+        userId,
+        planId,
+        multiplier: plan.multiplier,
+        duration: plan.duration,
+        price: plan.price,
+        expiresAt,
+      })
+      .returning();
+
+    return boost;
   }
 
   // Analytics

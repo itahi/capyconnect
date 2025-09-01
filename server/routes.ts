@@ -446,6 +446,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes
+  app.get("/api/admin/check", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      res.json({ isAdmin: user?.isAdmin || false });
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      res.status(500).json({ error: "Failed to check admin status" });
+    }
+  });
+
+  app.get("/api/admin/posts", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const posts = await storage.getAllPostsForAdmin();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching admin posts:", error);
+      res.status(500).json({ error: "Failed to fetch posts" });
+    }
+  });
+
+  app.get("/api/admin/stats", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const stats = await storage.getAdminStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  app.patch("/api/admin/posts/:id/status", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const { isActive } = req.body;
+      await storage.updatePostStatus(req.params.id, isActive);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating post status:", error);
+      res.status(500).json({ error: "Failed to update post status" });
+    }
+  });
+
+  app.patch("/api/admin/posts/:id/featured", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const { isFeatured } = req.body;
+      await storage.updatePostFeatured(req.params.id, isFeatured);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating post featured status:", error);
+      res.status(500).json({ error: "Failed to update featured status" });
+    }
+  });
+
+  app.delete("/api/admin/posts/:id", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      await storage.deletePostAdmin(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
+  // Boost/Impulsionamento routes
+  app.get("/api/posts/:id/boosts", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const boosts = await storage.getPostBoosts(postId);
+      res.json(boosts);
+    } catch (error) {
+      console.error("Error fetching post boosts:", error);
+      res.status(500).json({ error: "Failed to fetch boosts" });
+    }
+  });
+
+  app.post("/api/posts/:id/boost", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId!;
+      const { planId } = req.body;
+
+      // Verify post ownership
+      const post = await storage.getPostById(postId);
+      if (!post || post.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Check if post already has active boost
+      const activeBoosts = await storage.getActivePostBoosts(postId);
+      if (activeBoosts.length > 0) {
+        return res.status(400).json({ error: "Post already has active boost" });
+      }
+
+      // Create boost record (in real app, integrate with Stripe here)
+      const boost = await storage.createPostBoost(postId, planId, userId);
+      
+      res.json(boost);
+    } catch (error) {
+      console.error("Error creating boost:", error);
+      res.status(500).json({ error: "Failed to create boost" });
+    }
+  });
+
   app.get("/api/user/posts", requireAuth, async (req, res) => {
     try {
       const posts = await storage.getUserPosts(req.session.userId!);

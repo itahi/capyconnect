@@ -86,12 +86,26 @@ export const comments = pgTable("comments", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const boosts = pgTable("boosts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").references(() => posts.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  planId: varchar("plan_id").notNull(), // basic, premium, pro
+  multiplier: integer("multiplier").notNull().default(2),
+  duration: integer("duration").notNull().default(3), // days
+  price: integer("price").notNull(), // in cents
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   likes: many(likes),
   comments: many(comments),
   favorites: many(favorites),
+  boosts: many(boosts),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -106,6 +120,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   likes: many(likes),
   comments: many(comments),
   favorites: many(favorites),
+  boosts: many(boosts),
 }));
 
 export const likesRelations = relations(likes, ({ one }) => ({
@@ -143,6 +158,17 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
   post: one(posts, {
     fields: [favorites.postId],
     references: [posts.id],
+  }),
+}));
+
+export const boostsRelations = relations(boosts, ({ one }) => ({
+  post: one(posts, {
+    fields: [boosts.postId],
+    references: [posts.id],
+  }),
+  user: one(users, {
+    fields: [boosts.userId],
+    references: [users.id],
   }),
 }));
 
