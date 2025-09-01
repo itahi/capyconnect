@@ -425,6 +425,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get like/favorite status for a post
+  app.get("/api/posts/:id/like-status", requireAuth, async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.session!.userId!;
+      
+      const [liked, favorited] = await Promise.all([
+        storage.isPostLiked(userId, postId),
+        storage.isPostFavorited(userId, postId)
+      ]);
+      
+      res.json({
+        liked,
+        favorited
+      });
+    } catch (error) {
+      console.error("Error checking like/favorite status:", error);
+      res.status(500).json({ error: "Failed to check status" });
+    }
+  });
+
   app.get("/api/user/posts", requireAuth, async (req, res) => {
     try {
       const posts = await storage.getUserPosts(req.session.userId!);

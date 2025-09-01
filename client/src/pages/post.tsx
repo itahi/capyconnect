@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import React from "react";
 
 interface Post {
   id: string;
@@ -49,6 +50,26 @@ export default function PostPage() {
     queryKey: [`/api/posts/${id}`],
     enabled: !!id,
   });
+
+  // Check like/favorite status when authenticated
+  const { data: likeStatus } = useQuery({
+    queryKey: [`/api/posts/${id}/like-status`],
+    enabled: !!id && isAuthenticated,
+  });
+
+  // Update states when data changes
+  React.useEffect(() => {
+    if (post) {
+      setLikesCount(post.likesCount);
+    }
+  }, [post]);
+
+  React.useEffect(() => {
+    if (likeStatus) {
+      setIsLiked(likeStatus.liked);
+      setIsFavorited(likeStatus.favorited);
+    }
+  }, [likeStatus]);
 
   const { data: comments } = useQuery({
     queryKey: [`/api/posts/${id}/comments`],
@@ -372,7 +393,7 @@ export default function PostPage() {
                   data-testid={`button-like-${post.id}`}
                 >
                   <ThumbsUp className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
-                  <span>{post.likesCount}</span>
+                  <span>{likesCount}</span>
                 </Button>
 
                 <Button
