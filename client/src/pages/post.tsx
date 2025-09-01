@@ -52,7 +52,7 @@ export default function PostPage() {
   });
 
   // Check like/favorite status when authenticated
-  const { data: likeStatus } = useQuery({
+  const { data: likeStatus } = useQuery<{liked: boolean, favorited: boolean}>({
     queryKey: [`/api/posts/${id}/like-status`],
     enabled: !!id && isAuthenticated,
   });
@@ -71,7 +71,7 @@ export default function PostPage() {
     }
   }, [likeStatus]);
 
-  const { data: comments } = useQuery({
+  const { data: comments = [] } = useQuery({
     queryKey: [`/api/posts/${id}/comments`],
     enabled: showComments && !!id,
   });
