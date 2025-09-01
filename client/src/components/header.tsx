@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, User, LogOut } from "lucide-react";
+import { Search, Menu, X, User, LogOut, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,10 +27,12 @@ function UserActions() {
           </Button>
         </Link>
 
-        <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
-          <i className="fas fa-heart"></i>
-          <span className="hidden md:block">Favoritos</span>
-        </Button>
+        <Link href="/favoritos">
+          <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-red-500">
+            <Heart className="h-4 w-4" />
+            <span className="hidden md:block">Favoritos</span>
+          </Button>
+        </Link>
 
         <div className="flex items-center space-x-2 text-gray-700">
           <span className="hidden md:block font-medium">Olá, {user.name?.split(' ')[0] || 'Usuário'}</span>
@@ -56,10 +58,12 @@ function UserActions() {
 
   return (
     <div className="flex items-center space-x-4">
-      <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
-        <i className="fas fa-heart"></i>
-        <span className="hidden md:block">Favoritos</span>
-      </Button>
+      <Link href="/favoritos">
+        <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-red-500">
+          <Heart className="h-4 w-4" />
+          <span className="hidden md:block">Favoritos</span>
+        </Button>
+      </Link>
 
       <Link href="/login">
         <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white">
