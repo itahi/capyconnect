@@ -319,8 +319,10 @@ export function PostCard({ post }: PostCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              className={`flex items-center space-x-1 ${
-                isLiked ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+              className={`flex items-center space-x-1 transition-colors duration-200 ${
+                isLiked 
+                  ? 'text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700' 
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
               onClick={handleLike}
               disabled={likeMutation.isPending}
