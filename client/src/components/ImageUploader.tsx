@@ -8,9 +8,10 @@ interface ImageUploaderProps {
   onImagesChange: (imageUrls: string[]) => void;
   maxImages?: number;
   className?: string;
+  disabled?: boolean;
 }
 
-export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }: ImageUploaderProps) {
+export function ImageUploader({ onImagesChange, maxImages = 8, className = "", disabled = false }: ImageUploaderProps) {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -179,7 +180,7 @@ export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }:
               type="button"
               variant="outline"
               onClick={openFileSelector}
-              disabled={isUploading || uploadedImages.length >= maxImages}
+              disabled={disabled || isUploading || uploadedImages.length >= maxImages}
               className="mb-4"
             >
               <Upload className="h-4 w-4 mr-2" />

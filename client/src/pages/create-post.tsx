@@ -319,7 +319,6 @@ export default function CreatePost() {
                     <ImageUploader
                       onImagesChange={handleImagesChange}
                       maxImages={3}
-                      currentImages={uploadedImages}
                       disabled={createPostMutation.isPending}
                     />
                   </div>
