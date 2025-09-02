@@ -71,7 +71,7 @@ export default function PostPage() {
     }
   }, [likeStatus]);
 
-  const { data: comments = [] } = useQuery({
+  const { data: comments = [] } = useQuery<any[]>({
     queryKey: [`/api/posts/${id}/comments`],
     enabled: showComments && !!id,
   });
@@ -83,7 +83,10 @@ export default function PostPage() {
     onSuccess: (data: any) => {
       setIsLiked(data.liked);
       setLikesCount(data.likesCount);
+      // Invalidate all related queries to sync with homepage
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/posts/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/posts/${id}/like-status`] });
     },
     onError: () => {
       if (!isAuthenticated) {
@@ -102,7 +105,11 @@ export default function PostPage() {
     },
     onSuccess: (data: any) => {
       setIsFavorited(data.favorited);
+      // Invalidate all related queries to sync with homepage
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/posts/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/posts/${id}/like-status`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/favorites"] });
     },
     onError: () => {
       if (!isAuthenticated) {
