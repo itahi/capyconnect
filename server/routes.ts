@@ -273,6 +273,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update post endpoint
+  app.put("/api/posts/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.session.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const updatedPost = await storage.updatePost(id, req.body, userId);
+      if (!updatedPost) {
+        return res.status(404).json({ error: "Post not found or unauthorized" });
+      }
+      
+      res.json(updatedPost);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      res.status(500).json({ error: "Failed to update post" });
+    }
+  });
+
   app.post("/api/posts", requireAuth, async (req, res) => {
     try {
       const postData = insertPostSchema.parse({

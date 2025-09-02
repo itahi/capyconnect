@@ -29,9 +29,10 @@ function Router() {
       <Route path="/postar" component={CreatePost} />
       <Route path="/postar-anuncios" component={PostarAnuncios} />
       <Route path="/meus-anuncios" component={MeusAnuncios} />
+      <Route path="/editar-anuncio/:id" component={() => import("./pages/editar-anuncio")} />
+      <Route path="/impulsionar/:id" component={() => import("./pages/impulsionar")} />
       <Route path="/favoritos" component={FavoritosPage} />
       <Route path="/admin" component={AdminPage} />
-      <Route path="/post/:id/impulsionar" component={ImpulsionarPage} />
       <Route component={NotFound} />
     </Switch>
   );

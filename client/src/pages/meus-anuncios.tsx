@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Edit, Trash2, Eye, Heart, MessageCircle, Plus, Search } from "lucide-react";
+import { Edit, Trash2, Eye, Heart, MessageCircle, Plus, Search, Zap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -67,9 +67,7 @@ export default function MeusAnuncios() {
 
   const deletePostMutation = useMutation({
     mutationFn: async (postId: string) => {
-      return apiRequest(`/api/posts/${postId}`, {
-        method: "DELETE",
-      });
+      return apiRequest("DELETE", `/api/posts/${postId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/posts"] });
@@ -334,6 +332,18 @@ export default function MeusAnuncios() {
                           <Button variant="outline" size="sm" className="w-full">
                             <Edit className="h-4 w-4 mr-2" />
                             Editar
+                          </Button>
+                        </Link>
+                        
+                        <Link href={`/impulsionar/${post.id}`} className="flex-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:from-purple-600 hover:to-pink-600"
+                            data-testid="button-boost-post"
+                          >
+                            <Zap className="h-4 w-4 mr-2" />
+                            Impulsionar
                           </Button>
                         </Link>
                         
