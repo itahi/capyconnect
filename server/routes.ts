@@ -232,7 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Posts
   app.get("/api/posts", optionalAuth, async (req, res) => {
     try {
-      const { categoryId, type, isFeatured, limit, search, location } = req.query;
+      const { categoryId, type, isFeatured, limit, search, location, minPrice, maxPrice, store } = req.query;
       
       const options: any = {};
       if (categoryId) options.categoryId = String(categoryId);
@@ -241,6 +241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (limit) options.limit = parseInt(String(limit));
       if (search) options.search = String(search);
       if (location) options.location = String(location);
+      if (minPrice) options.minPrice = parseFloat(String(minPrice));
+      if (maxPrice) options.maxPrice = parseFloat(String(maxPrice));
+      if (store) options.store = String(store);
       if (req.session.userId) options.userId = req.session.userId;
 
       const posts = await storage.getPosts(options);

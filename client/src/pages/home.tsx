@@ -3,13 +3,33 @@ import type { Category, PostWithRelations } from "@shared/schema";
 import Header from "@/components/header";
 import CategoryTabs from "@/components/category-tabs";
 import { PostCard } from "@/components/PostCard";
+import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useState } from "react";
 
+interface SearchFilters {
+  search: string;
+  categoryId: string;
+  minPrice: string;
+  maxPrice: string;
+  location: string;
+  store: string;
+  type: string;
+}
+
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    search: "",
+    categoryId: "",
+    minPrice: "",
+    maxPrice: "",
+    location: "",
+    store: "",
+    type: "",
+  });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
@@ -20,18 +40,58 @@ export default function Home() {
     queryFn: () => fetch("/api/posts?isFeatured=true&limit=6").then(res => res.json()),
   });
 
+  // Build query parameters from search filters
+  const buildQueryParams = (filters: SearchFilters) => {
+    const params = new URLSearchParams();
+    if (filters.search) params.append('search', filters.search);
+    if (filters.categoryId) params.append('categoryId', filters.categoryId);
+    if (filters.minPrice) params.append('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+    if (filters.location) params.append('location', filters.location);
+    if (filters.store) params.append('store', filters.store);
+    if (filters.type) params.append('type', filters.type);
+    return params.toString();
+  };
+
   const { data: allPosts, isLoading: allPostsLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts"],
+    queryKey: ["/api/posts", searchFilters],
+    queryFn: () => {
+      const queryParams = buildQueryParams(searchFilters);
+      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts';
+      return fetch(url).then(res => res.json());
+    },
   });
+
+  // Also update the search from header when user types
+  const handleHeaderSearchChange = (newSearch: string) => {
+    setSearchQuery(newSearch);
+    setSearchFilters(prev => ({ ...prev, search: newSearch }));
+  };
+
+  const handleAdvancedSearch = (filters: SearchFilters) => {
+    setSearchFilters(filters);
+    setSearchQuery(filters.search); // Keep the header search in sync
+  };
 
   return (
     <div className="min-h-screen bg-purple-50">
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Header searchQuery={searchQuery} onSearchChange={handleHeaderSearchChange} />
       
-
-
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Advanced Search */}
+        <AdvancedSearch
+          onSearch={handleAdvancedSearch}
+          initialFilters={{
+            search: searchQuery,
+            categoryId: searchFilters.categoryId,
+            minPrice: searchFilters.minPrice,
+            maxPrice: searchFilters.maxPrice,
+            location: searchFilters.location,
+            store: searchFilters.store,
+            type: searchFilters.type,
+          }}
+        />
         {/* Featured Posts Section */}
         <section className="mb-8">
           <div className="flex items-center justify-between mb-6">

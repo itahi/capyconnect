@@ -48,6 +48,9 @@ export interface IStorage {
     search?: string;
     location?: string;
     userId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    store?: string;
   }): Promise<PostWithRelations[]>;
   getPostById(id: string, userId?: string): Promise<PostWithRelations | undefined>;
   createPost(post: InsertPost): Promise<Post>;
@@ -212,8 +215,11 @@ export class DatabaseStorage implements IStorage {
     search?: string;
     location?: string;
     userId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    store?: string;
   } = {}): Promise<PostWithRelations[]> {
-    const { categoryId, type, isFeatured, limit = 50, search, location, userId } = options;
+    const { categoryId, type, isFeatured, limit = 50, search, location, userId, minPrice, maxPrice, store } = options;
 
     // Build where conditions
     const conditions = [eq(posts.isActive, true)];
@@ -238,6 +244,18 @@ export class DatabaseStorage implements IStorage {
 
     if (location) {
       conditions.push(ilike(posts.location, `%${location}%`));
+    }
+
+    if (minPrice !== undefined) {
+      conditions.push(sql`${posts.price} >= ${minPrice * 100}`); // Convert to cents
+    }
+
+    if (maxPrice !== undefined) {
+      conditions.push(sql`${posts.price} <= ${maxPrice * 100}`); // Convert to cents
+    }
+
+    if (store) {
+      conditions.push(ilike(users.name, `%${store}%`));
     }
 
     const result = await db
