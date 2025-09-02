@@ -67,6 +67,35 @@ export class ImageProcessor {
   }
 
   /**
+   * Standardize image for marketplace listings with consistent format
+   */
+  static async standardizeForMarketplace(
+    imageBuffer: Buffer,
+    options: ImageProcessingOptions = {}
+  ): Promise<Buffer> {
+    const opts = { 
+      maxWidth: 800, 
+      maxHeight: 600, 
+      quality: 85, 
+      format: "jpeg" as const,
+      ...options 
+    };
+
+    return sharp(imageBuffer)
+      .resize(opts.maxWidth, opts.maxHeight, {
+        fit: "cover",
+        position: "center",
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      })
+      .flatten() // Remove transparency
+      .jpeg({ 
+        quality: opts.quality,
+        progressive: true
+      })
+      .toBuffer();
+  }
+
+  /**
    * Create multiple sizes for responsive images
    */
   static async createMultipleSizes(

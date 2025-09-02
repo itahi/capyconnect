@@ -142,7 +142,7 @@ export default function EditarAnuncio() {
       
       toast({
         title: "Imagens enviadas!",
-        description: `${result.imageUrls.length} imagem(ns) adicionada(s) com sucesso.`,
+        description: `${result.imageUrls.length} imagem(ns) padronizada(s) e adicionada(s) com sucesso.`,
       });
     } catch (error) {
       toast({
@@ -402,6 +402,9 @@ export default function EditarAnuncio() {
                   {/* Images */}
                   <div className="space-y-4">
                     <Label>Imagens (máximo 8)</Label>
+                    <p className="text-sm text-gray-600 mb-2">
+                      ✨ Suas imagens serão automaticamente padronizadas para 800x600px com qualidade otimizada
+                    </p>
                     
                     {/* Image Grid */}
                     {images.length > 0 && (

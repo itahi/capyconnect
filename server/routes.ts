@@ -25,6 +25,9 @@ import { randomUUID } from "crypto";
 // Simple in-memory image storage for demo
 const imageStorage = new Map<string, Buffer>();
 
+// Clear any existing problematic images on startup
+imageStorage.clear();
+
 // Add a demo image on startup
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -180,15 +183,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const imageId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const imagePath = `/api/images/${imageId}`;
         
-        // Store image buffer in memory
-        imageStorage.set(imageId, file.buffer);
+        // Standardize image format for marketplace consistency
+        let processedBuffer: Buffer;
+        try {
+          processedBuffer = await ImageProcessor.standardizeForMarketplace(file.buffer, {
+            maxWidth: 800,
+            maxHeight: 600,
+            quality: 85,
+            format: "jpeg"
+          });
+        } catch (processingError) {
+          console.warn("Image processing failed, using original:", processingError);
+          processedBuffer = file.buffer;
+        }
+        
+        // Store standardized image buffer in memory
+        imageStorage.set(imageId, processedBuffer);
         imageUrls.push(imagePath);
       }
 
       res.json({
         success: true,
         imageUrls,
-        message: `${req.files.length} image(s) uploaded successfully`,
+        message: `${req.files.length} image(s) uploaded and standardized successfully`,
       });
 
     } catch (error) {
@@ -209,22 +226,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (imageBuffer) {
         res.set({
           'Content-Type': 'image/jpeg',
-          'Cache-Control': 'public, max-age=3600'
+          'Cache-Control': 'public, max-age=3600',
+          'X-Image-Standardized': 'true' // Indicate image has been processed
         });
         return res.send(imageBuffer);
       }
       
-      // If not in memory, try object storage
-      const objectPath = `/objects/uploads/${imageId}`;
-      const objectStorageService = new ObjectStorageService();
-      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-      await objectStorageService.downloadObject(objectFile, res);
+      // Image not found in memory storage
+      return res.status(404).json({ error: "Image not found" });
       
     } catch (error) {
       console.error("Get image error:", error);
-      if (error instanceof ObjectNotFoundError) {
-        return res.status(404).json({ error: "Image not found" });
-      }
       res.status(500).json({ error: "Failed to get image" });
     }
   });

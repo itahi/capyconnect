@@ -84,7 +84,7 @@ export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }:
       if (newImageUrls.length > 0) {
         toast({
           title: "Upload concluído!",
-          description: `${newImageUrls.length} imagem(s) carregada(s) com sucesso`,
+          description: `${newImageUrls.length} imagem(s) padronizada(s) e carregada(s) com sucesso`,
         });
       }
 
@@ -192,7 +192,7 @@ export function ImageUploader({ onImagesChange, maxImages = 8, className = "" }:
             <p className="text-xs text-gray-500">
               Formatos aceitos: JPG, PNG, WebP • Máximo 10MB por imagem
               <br />
-              As imagens serão redimensionadas automaticamente para otimizar a visualização
+              ✨ As imagens serão automaticamente padronizadas para 800x600px com qualidade otimizada
             </p>
           </div>
         </CardContent>
