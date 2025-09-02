@@ -34,6 +34,15 @@ function UserActions() {
           </Button>
         </Link>
 
+        {user.name === 'igor' && (
+          <Link href="/admin">
+            <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-purple-600">
+              <span className="text-purple-600">⚙️</span>
+              <span className="hidden md:block">Admin</span>
+            </Button>
+          </Link>
+        )}
+
         <div className="flex items-center space-x-2 text-gray-700">
           <span className="hidden md:block font-medium">Olá, {user.name?.split(' ')[0] || 'Usuário'}</span>
         </div>
