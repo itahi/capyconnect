@@ -117,8 +117,20 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {featuredPosts?.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {featuredPosts?.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           )}
@@ -161,8 +173,20 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {allPosts?.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {allPosts?.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           )}

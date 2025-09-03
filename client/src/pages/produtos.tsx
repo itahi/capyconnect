@@ -26,15 +26,15 @@ export default function ProdutosPage() {
     maxPrice: "",
     location: "",
     store: "",
-    type: "products",
+    type: "product",
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
-  // Filter categories to show only products
-  const productCategories = categories?.filter(cat => cat.type === 'products') || [];
+  // Filter categories to show only product
+  const productCategories = categories?.filter(cat => cat.type === 'product') || [];
 
   // Build query parameters from search filters
   const buildQueryParams = (filters: SearchFilters) => {
@@ -50,10 +50,10 @@ export default function ProdutosPage() {
   };
 
   const { data: productPosts, isLoading: postsLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts", "products", searchFilters],
+    queryKey: ["/api/posts", "product", searchFilters],
     queryFn: () => {
       const queryParams = buildQueryParams(searchFilters);
-      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=products';
+      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=product';
       return fetch(url).then(res => res.json());
     },
   });
@@ -64,7 +64,7 @@ export default function ProdutosPage() {
   };
 
   const handleAdvancedSearch = (filters: SearchFilters) => {
-    setSearchFilters({ ...filters, type: "products" });
+    setSearchFilters({ ...filters, type: "product" });
     setSearchQuery(filters.search);
   };
 
@@ -110,13 +110,13 @@ export default function ProdutosPage() {
         <div className="mb-8">
           <AdvancedSearch 
             onSearch={handleAdvancedSearch}
-            initialFilters={{ type: "products" }}
+            initialFilters={{ type: "product" }}
           />
         </div>
 
         {/* Add Product Button */}
         <div className="mb-8 text-center">
-          <Link href="/postar?type=products">
+          <Link href="/postar?type=product">
             <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white px-8 py-3">
               Anunciar Produto
             </Button>
@@ -138,14 +138,26 @@ export default function ProdutosPage() {
             </div>
           ) : productPosts && productPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {productPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {productPosts.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Nenhum produto encontrado</p>
-              <Link href="/postar?type=products">
+              <Link href="/postar?type=product">
                 <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white">
                   Seja o primeiro a anunciar
                 </Button>

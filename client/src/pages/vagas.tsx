@@ -26,15 +26,15 @@ export default function VagasPage() {
     maxPrice: "",
     location: "",
     store: "",
-    type: "jobs",
+    type: "job",
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
-  // Filter categories to show only jobs
-  const jobCategories = categories?.filter(cat => cat.type === 'jobs') || [];
+  // Filter categories to show only job
+  const jobCategories = categories?.filter(cat => cat.type === 'job') || [];
 
   // Build query parameters from search filters
   const buildQueryParams = (filters: SearchFilters) => {
@@ -50,10 +50,10 @@ export default function VagasPage() {
   };
 
   const { data: jobPosts, isLoading: postsLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts", "jobs", searchFilters],
+    queryKey: ["/api/posts", "job", searchFilters],
     queryFn: () => {
       const queryParams = buildQueryParams(searchFilters);
-      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=jobs';
+      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=job';
       return fetch(url).then(res => res.json());
     },
   });
@@ -64,7 +64,7 @@ export default function VagasPage() {
   };
 
   const handleAdvancedSearch = (filters: SearchFilters) => {
-    setSearchFilters({ ...filters, type: "jobs" });
+    setSearchFilters({ ...filters, type: "job" });
     setSearchQuery(filters.search);
   };
 
@@ -110,13 +110,13 @@ export default function VagasPage() {
         <div className="mb-8">
           <AdvancedSearch 
             onSearch={handleAdvancedSearch}
-            initialFilters={{ type: "jobs" }}
+            initialFilters={{ type: "job" }}
           />
         </div>
 
         {/* Add Job Button */}
         <div className="mb-8 text-center">
-          <Link href="/postar?type=jobs">
+          <Link href="/postar?type=job">
             <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white px-8 py-3">
               Anunciar Vaga
             </Button>
@@ -138,14 +138,26 @@ export default function VagasPage() {
             </div>
           ) : jobPosts && jobPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {jobPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {jobPosts.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Nenhuma vaga encontrada</p>
-              <Link href="/postar?type=jobs">
+              <Link href="/postar?type=job">
                 <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white">
                   Seja o primeiro a anunciar
                 </Button>

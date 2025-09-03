@@ -138,8 +138,20 @@ export default function NoticiasPage() {
             </div>
           ) : newsPosts && newsPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newsPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {newsPosts.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           ) : (

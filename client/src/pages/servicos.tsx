@@ -26,7 +26,7 @@ export default function ServicosPage() {
     maxPrice: "",
     location: "",
     store: "",
-    type: "services",
+    type: "service",
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -34,7 +34,7 @@ export default function ServicosPage() {
   });
 
   // Filter categories to show only services
-  const serviceCategories = categories?.filter(cat => cat.type === 'services') || [];
+  const serviceCategories = categories?.filter(cat => cat.type === 'service') || [];
 
   // Build query parameters from search filters
   const buildQueryParams = (filters: SearchFilters) => {
@@ -50,10 +50,10 @@ export default function ServicosPage() {
   };
 
   const { data: servicePosts, isLoading: postsLoading } = useQuery<PostWithRelations[]>({
-    queryKey: ["/api/posts", "services", searchFilters],
+    queryKey: ["/api/posts", "service", searchFilters],
     queryFn: () => {
       const queryParams = buildQueryParams(searchFilters);
-      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=services';
+      const url = queryParams ? `/api/posts?${queryParams}` : '/api/posts?type=service';
       return fetch(url).then(res => res.json());
     },
   });
@@ -64,7 +64,7 @@ export default function ServicosPage() {
   };
 
   const handleAdvancedSearch = (filters: SearchFilters) => {
-    setSearchFilters({ ...filters, type: "services" });
+    setSearchFilters({ ...filters, type: "service" });
     setSearchQuery(filters.search);
   };
 
@@ -110,13 +110,13 @@ export default function ServicosPage() {
         <div className="mb-8">
           <AdvancedSearch 
             onSearch={handleAdvancedSearch}
-            initialFilters={{ type: "services" }}
+            initialFilters={{ type: "service" }}
           />
         </div>
 
         {/* Add Service Button */}
         <div className="mb-8 text-center">
-          <Link href="/postar?type=services">
+          <Link href="/postar?type=service">
             <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white px-8 py-3">
               Anunciar Serviço
             </Button>
@@ -138,14 +138,26 @@ export default function ServicosPage() {
             </div>
           ) : servicePosts && servicePosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicePosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {servicePosts.filter(post => post.category && post.user).map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  post={{
+                    ...post,
+                    createdAt: post.createdAt instanceof Date ? post.createdAt.toISOString() : post.createdAt,
+                    category: post.category!,
+                    user: {
+                      id: post.user!.id,
+                      name: post.user!.name,
+                      avatar: post.user!.avatar
+                    }
+                  }} 
+                />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Nenhum serviço encontrado</p>
-              <Link href="/postar?type=services">
+              <Link href="/postar?type=service">
                 <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white">
                   Seja o primeiro a anunciar
                 </Button>
