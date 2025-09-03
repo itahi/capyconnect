@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface PostCardProps {
   post: {
@@ -40,6 +41,7 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const { isAuthenticated, user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [localLiked, setLocalLiked] = useState(false);
   const [localFavorited, setLocalFavorited] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
@@ -89,11 +91,33 @@ export function PostCard({ post }: PostCardProps) {
       setLocalFavorited(!localFavorited);
       return { previousFavorited: localFavorited };
     },
+    onSuccess: (data) => {
+      // Show success notification
+      if (data.favorited) {
+        toast({
+          title: "Favorito adicionado!",
+          description: `O anúncio "${post.title}" foi adicionado aos seus favoritos.`,
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "Favorito removido",
+          description: `O anúncio "${post.title}" foi removido dos seus favoritos.`,
+          duration: 3000,
+        });
+      }
+    },
     onError: (err, variables, context) => {
       // Rollback on error
       if (context) {
         setLocalFavorited(context.previousFavorited);
       }
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar seus favoritos. Tente novamente.",
+        variant: "destructive",
+        duration: 3000,
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/posts/${post.id}/like-status`] });
