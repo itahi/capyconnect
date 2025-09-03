@@ -28,12 +28,12 @@ export function AdvancedSearch({ onSearch, initialFilters = {} }: AdvancedSearch
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     search: initialFilters.search || "",
-    categoryId: initialFilters.categoryId || "",
+    categoryId: initialFilters.categoryId || "all",
     minPrice: initialFilters.minPrice || "",
     maxPrice: initialFilters.maxPrice || "",
     location: initialFilters.location || "",
     store: initialFilters.store || "",
-    type: initialFilters.type || "",
+    type: initialFilters.type || "all",
   });
 
   const { data: categories } = useQuery<Category[]>({
@@ -52,22 +52,22 @@ export function AdvancedSearch({ onSearch, initialFilters = {} }: AdvancedSearch
   const clearFilters = () => {
     const emptyFilters = {
       search: "",
-      categoryId: "",
+      categoryId: "all",
       minPrice: "",
       maxPrice: "",
       location: "",
       store: "",
-      type: "",
+      type: "all",
     };
     setFilters(emptyFilters);
     onSearch(emptyFilters);
   };
 
   const hasActiveFilters = Object.values(filters).some(value => value !== "");
-  const hasAdvancedFilters = filters.categoryId || filters.minPrice || filters.maxPrice || filters.location || filters.store || filters.type;
+  const hasAdvancedFilters = (filters.categoryId && filters.categoryId !== "all") || filters.minPrice || filters.maxPrice || filters.location || filters.store || (filters.type && filters.type !== "all");
 
   const categoryTypes = [
-    { value: "", label: "Todos os tipos" },
+    { value: "all", label: "Todos os tipos" },
     { value: "service", label: "Serviços" },
     { value: "product", label: "Produtos" },
     { value: "job", label: "Vagas" },
@@ -153,7 +153,7 @@ export function AdvancedSearch({ onSearch, initialFilters = {} }: AdvancedSearch
                       <SelectValue placeholder="Selecione a categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todas as categorias</SelectItem>
+                      <SelectItem value="all">Todas as categorias</SelectItem>
                       {categories?.filter(cat => !filters.type || cat.type === filters.type).map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.icon} {category.name}
@@ -238,21 +238,21 @@ export function AdvancedSearch({ onSearch, initialFilters = {} }: AdvancedSearch
         {hasAdvancedFilters && (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-sm text-gray-600">Filtros ativos:</span>
-            {filters.type && (
+            {filters.type && filters.type !== "all" && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
                 Tipo: {categoryTypes.find(t => t.value === filters.type)?.label}
                 <X 
                   className="h-3 w-3 cursor-pointer" 
-                  onClick={() => handleFilterChange("type", "")}
+                  onClick={() => handleFilterChange("type", "all")}
                 />
               </span>
             )}
-            {filters.categoryId && (
+            {filters.categoryId && filters.categoryId !== "all" && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
                 Categoria: {categories?.find(c => c.id === filters.categoryId)?.name}
                 <X 
                   className="h-3 w-3 cursor-pointer" 
-                  onClick={() => handleFilterChange("categoryId", "")}
+                  onClick={() => handleFilterChange("categoryId", "all")}
                 />
               </span>
             )}

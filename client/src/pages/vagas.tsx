@@ -21,7 +21,7 @@ export default function VagasPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     search: "",
-    categoryId: "",
+    categoryId: "all",
     minPrice: "",
     maxPrice: "",
     location: "",
@@ -40,7 +40,7 @@ export default function VagasPage() {
   const buildQueryParams = (filters: SearchFilters) => {
     const params = new URLSearchParams();
     if (filters.search) params.append('search', filters.search);
-    if (filters.categoryId) params.append('categoryId', filters.categoryId);
+    if (filters.categoryId && filters.categoryId !== 'all') params.append('categoryId', filters.categoryId);
     if (filters.minPrice) params.append('minPrice', filters.minPrice);
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
     if (filters.location) params.append('location', filters.location);

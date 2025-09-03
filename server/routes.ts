@@ -247,8 +247,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { categoryId, type, isFeatured, limit, search, location, minPrice, maxPrice, store } = req.query;
       
       const options: any = {};
-      if (categoryId) options.categoryId = String(categoryId);
-      if (type) options.type = String(type);
+      if (categoryId && categoryId !== 'all') options.categoryId = String(categoryId);
+      if (type && type !== 'all') options.type = String(type);
       if (isFeatured !== undefined) options.isFeatured = isFeatured === 'true';
       if (limit) options.limit = parseInt(String(limit));
       if (search) options.search = String(search);
