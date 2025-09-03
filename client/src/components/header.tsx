@@ -118,12 +118,20 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
         {/* Main header */}
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center">
+            <Link href="/" className="flex items-center space-x-3 group">
               <img 
                 src="/attached_assets/ChatGPT Image 1 de ago. de 2025, 11_29_20_1756924509649.png" 
                 alt="Capivara Elisa" 
-                className="h-16 w-16 object-cover rounded-full hover:scale-105 transition-transform duration-200"
+                className="h-16 w-16 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
               />
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
+                  CapyConnect
+                </h1>
+                <span className="text-xs text-purple-600 font-medium">
+                  Marketplace Brasileiro
+                </span>
+              </div>
             </Link>
           </div>
 
