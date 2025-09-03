@@ -111,7 +111,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
         {/* Top banner */}
-        <div className="bg-gradient-to-r from-primary-yellow to-secondary-yellow text-white text-center py-2 text-sm">
+        <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 text-sm font-medium">
           🚀 Marketplace completo - Serviços, Produtos, Vagas e Notícias!
         </div>
         
