@@ -70,6 +70,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from attached_assets
+  const path = await import("path");
+  const express = await import("express");
+  app.use('/attached_assets', express.default.static(path.default.join(process.cwd(), 'attached_assets')));
+
   // Session middleware
   app.use(sessionConfig);
   
