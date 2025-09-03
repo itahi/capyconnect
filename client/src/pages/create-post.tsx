@@ -63,7 +63,7 @@ export default function CreatePost() {
     return null;
   }
 
-  const { data: categories } = useQuery<Category[]>({
+  const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
@@ -132,6 +132,14 @@ export default function CreatePost() {
   };
 
   const categoriesByType = categories?.filter(cat => cat.type === selectedType) || [];
+
+  if (categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-yellow"></div>
+      </div>
+    );
+  }
 
   const getTypeInfo = (type: string) => {
     switch (type) {
@@ -286,19 +294,16 @@ export default function CreatePost() {
                       <FormItem>
                         <FormLabel>Categoria *</FormLabel>
                         <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value || ""}>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
-                              {categoriesByType.map((category) => (
+                              {categoriesByType?.map((category) => (
                                 <SelectItem key={category.id} value={category.id}>
-                                  <div className="flex items-center space-x-2">
-                                    <i className={category.icon}></i>
-                                    <span>{category.name}</span>
-                                  </div>
+                                  {category.icon} {category.name}
                                 </SelectItem>
-                              ))}
+                              )) || []}
                             </SelectContent>
                           </Select>
                         </FormControl>

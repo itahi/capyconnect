@@ -47,7 +47,7 @@ export function PostCard({ post }: PostCardProps) {
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
 
   // Get like/favorite status
-  const { data: likeStatus } = useQuery({
+  const { data: likeStatus } = useQuery<{liked: boolean; favorited: boolean}>({
     queryKey: [`/api/posts/${post.id}/like-status`],
     enabled: isAuthenticated,
   });
@@ -91,7 +91,10 @@ export function PostCard({ post }: PostCardProps) {
       setLocalFavorited(!localFavorited);
       return { previousFavorited: localFavorited };
     },
-    onSuccess: (data) => {
+    onSuccess: async (response) => {
+      // Parse response to get data
+      const data = await response.json();
+      
       // Show success notification
       if (data.favorited) {
         toast({
