@@ -15,7 +15,7 @@ interface PostCardProps {
     title: string;
     description: string;
     price?: number | null;
-    location: string;
+    location: string | null;
     imageUrls?: string[] | null;
     whatsappNumber?: string | null;
     externalLink?: string | null;

@@ -151,16 +151,16 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
         <nav className="border-t border-gray-200">
           <div className="flex items-center justify-between py-3">
             <div className="hidden md:flex space-x-8">
-              <Link href="/categoria/servicos" className="text-gray-600 hover:text-primary-yellow font-medium">
+              <Link href="/servicos" className="text-gray-600 hover:text-primary-yellow font-medium">
                 Serviços
               </Link>
-              <Link href="/categoria/produtos" className="text-gray-600 hover:text-primary-yellow font-medium">
+              <Link href="/produtos" className="text-gray-600 hover:text-primary-yellow font-medium">
                 Produtos
               </Link>
-              <Link href="/categoria/vagas" className="text-gray-600 hover:text-primary-yellow font-medium">
+              <Link href="/vagas" className="text-gray-600 hover:text-primary-yellow font-medium">
                 Vagas
               </Link>
-              <Link href="/categoria/noticias" className="text-gray-600 hover:text-primary-yellow font-medium">
+              <Link href="/noticias" className="text-gray-600 hover:text-primary-yellow font-medium">
                 Notícias
               </Link>
             </div>
@@ -179,16 +179,16 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-200">
               <div className="flex flex-col space-y-3">
-                <Link href="/categoria/servicos" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
+                <Link href="/servicos" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
                   Serviços
                 </Link>
-                <Link href="/categoria/produtos" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
+                <Link href="/produtos" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
                   Produtos
                 </Link>
-                <Link href="/categoria/vagas" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
+                <Link href="/vagas" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
                   Vagas
                 </Link>
-                <Link href="/categoria/noticias" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
+                <Link href="/noticias" className="text-gray-600 hover:text-primary-yellow font-medium py-2">
                   Notícias
                 </Link>
               </div>

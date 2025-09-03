@@ -18,6 +18,10 @@ import FavoritosPage from "@/pages/favoritos";
 import AdminPage from "@/pages/admin";
 import TestPage from "@/pages/test-page";
 import NotFound from "@/pages/not-found";
+import ServicosPage from "@/pages/servicos";
+import ProdutosPage from "@/pages/produtos";
+import VagasPage from "@/pages/vagas";
+import NoticiasPage from "@/pages/noticias";
 
 function Router() {
   return (
@@ -34,6 +38,10 @@ function Router() {
       <Route path="/impulsionar/:id" component={Impulsionar} />
       <Route path="/favoritos" component={FavoritosPage} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/servicos" component={ServicosPage} />
+      <Route path="/produtos" component={ProdutosPage} />
+      <Route path="/vagas" component={VagasPage} />
+      <Route path="/noticias" component={NoticiasPage} />
       <Route component={NotFound} />
     </Switch>
   );
