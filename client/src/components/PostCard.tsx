@@ -269,10 +269,10 @@ export function PostCard({ post }: PostCardProps) {
             {post.whatsappNumber && (
               <Button
                 size="sm"
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm"
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm py-2.5 px-4"
                 onClick={() => handleContact('whatsapp')}
               >
-                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                <Phone className="h-4 w-4 mr-2" />
                 WhatsApp
               </Button>
             )}
@@ -280,10 +280,10 @@ export function PostCard({ post }: PostCardProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1 text-xs sm:text-sm"
+                className="flex-1 text-sm py-2.5 px-4"
                 onClick={() => handleContact('external')}
               >
-                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                <ExternalLink className="h-4 w-4 mr-2" />
                 Site
               </Button>
             )}

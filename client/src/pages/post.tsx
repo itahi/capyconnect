@@ -227,66 +227,78 @@ export default function PostPage() {
         </Link>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {/* Image Gallery */}
+          {/* Image Gallery - Estilo Mercado Livre */}
           {post.imageUrls && post.imageUrls.length > 0 && (
-            <div className="relative">
-              <div className="h-96 bg-gray-100">
-                <img
-                  src={post.imageUrls[currentImageIndex]}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-              
-              {/* Image Navigation */}
-              {post.imageUrls.length > 1 && (
-                <>
-                  <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
+            <div className="mb-6">
+              {/* Main Image */}
+              <div className="relative mb-3">
+                <div className="h-64 sm:h-96 bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in">
+                  <img
+                    src={post.imageUrls[currentImageIndex]}
+                    alt={post.title}
+                    className="w-full h-full object-contain hover:object-cover transition-all duration-300"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+                
+                {/* Navigation Arrows - só se tiver mais de 1 imagem */}
+                {post.imageUrls.length > 1 && (
+                  <>
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="bg-black/50 text-white hover:bg-black/70"
+                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/90 text-gray-800 hover:bg-white shadow-lg rounded-full h-10 w-10 p-0"
                       onClick={() => setCurrentImageIndex(prev => 
                         prev > 0 ? prev - 1 : post.imageUrls!.length - 1
                       )}
                     >
                       ←
                     </Button>
-                  </div>
-                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="bg-black/50 text-white hover:bg-black/70"
+                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/90 text-gray-800 hover:bg-white shadow-lg rounded-full h-10 w-10 p-0"
                       onClick={() => setCurrentImageIndex(prev => 
                         prev < post.imageUrls!.length - 1 ? prev + 1 : 0
                       )}
                     >
                       →
                     </Button>
-                  </div>
-                  
-                  {/* Image Indicators */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                    {post.imageUrls.map((_, index) => (
-                      <button
-                        key={index}
-                        className={`w-2 h-2 rounded-full ${
-                          index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                        }`}
-                        onClick={() => setCurrentImageIndex(index)}
+                  </>
+                )}
+                
+                {/* Image Counter */}
+                <div className="absolute top-3 right-3 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
+                  {currentImageIndex + 1} / {post.imageUrls.length}
+                </div>
+              </div>
+              
+              {/* Thumbnails - Estilo Mercado Livre */}
+              {post.imageUrls.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {post.imageUrls.map((imageUrl, index) => (
+                    <button
+                      key={index}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded border-2 overflow-hidden transition-all ${
+                        index === currentImageIndex 
+                          ? 'border-primary-yellow shadow-md' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setCurrentImageIndex(index)}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`Imagem ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
-                    ))}
-                  </div>
-                  
-                  {/* Image Counter */}
-                  <div className="absolute top-4 right-4 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
-                    {currentImageIndex + 1} / {post.imageUrls.length}
-                  </div>
-                </>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           )}
@@ -349,12 +361,12 @@ export default function PostPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
               {/* WhatsApp Button */}
               {post.whatsappNumber && (
                 <Button
                   onClick={handleWhatsApp}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+                  className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 py-3"
                   data-testid="button-whatsapp"
                 >
                   <Phone className="h-5 w-5" />
@@ -367,7 +379,7 @@ export default function PostPage() {
                 <Button
                   onClick={handleExternalLink}
                   variant="outline"
-                  className="flex-1 flex items-center justify-center gap-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white py-3"
                   data-testid="button-visit"
                 >
                   <ExternalLink className="h-5 w-5" />
