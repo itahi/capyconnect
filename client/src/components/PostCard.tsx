@@ -183,15 +183,16 @@ export function PostCard({ post }: PostCardProps) {
       <div className="relative">
         {/* Featured Badge */}
         {post.isFeatured && (
-          <Badge className="absolute top-3 left-3 z-10 bg-yellow-500 text-white">
+          <Badge className="absolute top-2 left-2 z-10 bg-yellow-500 text-white text-xs">
             <Zap className="h-3 w-3 mr-1" />
-            Impulsionado
+            <span className="hidden sm:inline">Impulsionado</span>
+            <span className="sm:hidden">⚡</span>
           </Badge>
         )}
 
         {/* Image */}
         <Link href={`/post/${post.id}`} className="block">
-          <div className="aspect-video bg-gray-200 overflow-hidden">
+          <div className="aspect-video sm:aspect-[4/3] bg-gray-200 overflow-hidden">
             {post.imageUrls && post.imageUrls[0] ? (
               <img
                 src={post.imageUrls[0]}
@@ -216,7 +217,7 @@ export function PostCard({ post }: PostCardProps) {
         </Link>
       </div>
 
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         {/* Category Badge */}
         <div className="flex items-center justify-between mb-3">
           <Badge variant="outline" className="text-xs">
@@ -228,10 +229,10 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Title and Description */}
         <Link href={`/post/${post.id}`} className="block mb-3">
-          <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary-yellow transition-colors">
+          <h3 className="font-semibold text-base sm:text-lg line-clamp-2 group-hover:text-primary-yellow transition-colors">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm line-clamp-2 mt-1">
+          <p className="text-gray-600 text-xs sm:text-sm line-clamp-2 mt-1">
             {post.description}
           </p>
         </Link>
@@ -239,7 +240,7 @@ export function PostCard({ post }: PostCardProps) {
         {/* Price */}
         {post.price && (
           <div className="mb-3">
-            <span className="text-2xl font-bold text-green-600">
+            <span className="text-xl sm:text-2xl font-bold text-green-600">
               {formatPrice(post.price)}
             </span>
           </div>
@@ -264,14 +265,14 @@ export function PostCard({ post }: PostCardProps) {
         {/* Actions */}
         <div className="space-y-2">
           {/* Contact Buttons */}
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {post.whatsappNumber && (
               <Button
                 size="sm"
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm"
                 onClick={() => handleContact('whatsapp')}
               >
-                <Phone className="h-4 w-4 mr-2" />
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 WhatsApp
               </Button>
             )}
@@ -279,10 +280,10 @@ export function PostCard({ post }: PostCardProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 text-xs sm:text-sm"
                 onClick={() => handleContact('external')}
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 Site
               </Button>
             )}
@@ -291,10 +292,11 @@ export function PostCard({ post }: PostCardProps) {
               <Link href={`/post/${post.id}/impulsionar`}>
                 <Button
                   size="sm"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white text-xs sm:text-sm"
                 >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Impulsionar
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                  <span className="hidden sm:inline">Impulsionar</span>
+                  <span className="sm:hidden">⚡</span>
                 </Button>
               </Link>
             )}

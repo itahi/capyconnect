@@ -80,26 +80,26 @@ export default function ServicosPage() {
     <div className="min-h-screen bg-gray-50">
       <Header searchQuery={searchQuery} onSearchChange={handleHeaderSearchChange} />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Serviços</h1>
-          <p className="text-gray-600">Encontre os melhores serviços profissionais</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Serviços</h1>
+          <p className="text-sm sm:text-base text-gray-600">Encontre os melhores serviços profissionais</p>
         </div>
 
         {/* Categories Grid */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Categorias de Serviços</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Categorias de Serviços</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             {serviceCategories.map((category) => (
               <Link 
                 key={category.id} 
                 href={`/categoria/${category.id}`}
-                className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border"
+                className="bg-white p-2 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border"
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{category.icon}</div>
-                  <span className="text-sm font-medium text-gray-700">{category.name}</span>
+                  <div className="text-lg sm:text-2xl mb-1 sm:mb-2">{category.icon}</div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 leading-tight">{category.name}</span>
                 </div>
               </Link>
             ))}
@@ -107,7 +107,7 @@ export default function ServicosPage() {
         </div>
 
         {/* Advanced Search */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <AdvancedSearch 
             onSearch={handleAdvancedSearch}
             initialFilters={{ type: "service" }}
@@ -115,9 +115,9 @@ export default function ServicosPage() {
         </div>
 
         {/* Add Service Button */}
-        <div className="mb-8 text-center">
+        <div className="mb-6 sm:mb-8 text-center">
           <Link href="/postar?type=service">
-            <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white px-8 py-3">
+            <Button className="bg-primary-yellow hover:bg-primary-yellow/90 text-white px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base">
               Anunciar Serviço
             </Button>
           </Link>
@@ -125,9 +125,9 @@ export default function ServicosPage() {
 
         {/* Posts Grid */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-6">Serviços Disponíveis</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Serviços Disponíveis</h2>
           {postsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white p-6 rounded-lg shadow-sm animate-pulse">
                   <div className="h-48 bg-gray-200 rounded mb-4"></div>

@@ -19,46 +19,34 @@ function UserActions() {
 
   if (isAuthenticated && user) {
     return (
-      <div className="flex items-center space-x-4">
-        <Link href="/meus-anuncios">
-          <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-primary-yellow">
-            <User className="h-4 w-4" />
-            <span className="hidden md:block">Meus Anúncios</span>
-          </Button>
-        </Link>
-
+      <div className="flex items-center space-x-1 sm:space-x-4">
         <Link href="/favoritos">
-          <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-red-500">
+          <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-red-500">
             <Heart className="h-4 w-4" />
-            <span className="hidden md:block">Favoritos</span>
           </Button>
         </Link>
 
         {user.name === 'igor' && (
           <Link href="/admin">
-            <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-purple-600">
+            <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-purple-600">
               <span className="text-purple-600">⚙️</span>
-              <span className="hidden md:block">Admin</span>
             </Button>
           </Link>
         )}
 
-        <div className="flex items-center space-x-2 text-gray-700">
-          <span className="hidden md:block font-medium">Olá, {user.name?.split(' ')[0] || 'Usuário'}</span>
-        </div>
-
         <Button 
-          variant="ghost" 
+          variant="ghost"
+          size="sm" 
           onClick={handleLogout}
-          className="flex items-center space-x-2 text-gray-600 hover:text-red-600"
+          className="p-2 text-gray-600 hover:text-red-600"
         >
           <LogOut className="h-4 w-4" />
-          <span className="hidden md:block">Sair</span>
         </Button>
 
         <Link href="/postar-anuncios">
-          <Button className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium">
-            Postar
+          <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium text-xs sm:text-sm px-3 py-2">
+            <span className="hidden sm:inline">Postar</span>
+            <span className="sm:hidden">+</span>
           </Button>
         </Link>
       </div>
@@ -66,29 +54,24 @@ function UserActions() {
   }
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center space-x-1 sm:space-x-4">
       <Link href="/favoritos">
-        <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-red-500">
+        <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-red-500">
           <Heart className="h-4 w-4" />
-          <span className="hidden md:block">Favoritos</span>
         </Button>
       </Link>
 
       <Link href="/login">
-        <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white">
-          Entrar
-        </Button>
-      </Link>
-
-      <Link href="/register">
-        <Button variant="outline" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white">
-          Cadastrar
+        <Button variant="outline" size="sm" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white text-xs sm:text-sm px-2 sm:px-4">
+          <span className="hidden sm:inline">Entrar</span>
+          <span className="sm:hidden">👤</span>
         </Button>
       </Link>
 
       <Link href="/postar-anuncios">
-        <Button className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium">
-          Postar
+        <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium text-xs sm:text-sm px-3 py-2">
+          <span className="hidden sm:inline">Postar</span>
+          <span className="sm:hidden">+</span>
         </Button>
       </Link>
     </div>
@@ -110,40 +93,47 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       {/* Top banner - Full width */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 text-sm font-medium">
-        🚀 Marketplace completo - Serviços, Produtos, Vagas e Notícias!
+      <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 text-xs sm:text-sm font-medium">
+        <span className="hidden sm:inline">🚀 Marketplace completo - Serviços, Produtos, Vagas e Notícias!</span>
+        <span className="sm:hidden">🚀 CapyConnect - Marketplace Brasileiro!</span>
       </div>
       
       <div className="container mx-auto px-4">
-        {/* Main header */}
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-3 group">
+        {/* Main header - Mobile optimized */}
+        <div className="flex flex-col space-y-3 py-3 md:py-4">
+          {/* Top row: Logo + User actions */}
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
               <img 
                 src="/attached_assets/ChatGPT Image 1 de ago. de 2025, 11_29_20_1756924509649.png" 
                 alt="Capivara Elisa" 
-                className="h-16 w-16 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
+                className="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
               />
               <div className="flex flex-col">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
                   CapyConnect
                 </h1>
-                <span className="text-xs text-purple-600 font-medium">
+                <span className="text-xs text-purple-600 font-medium hidden sm:block">
                   Marketplace Brasileiro
                 </span>
               </div>
             </Link>
+            
+            {/* User actions - mobile optimized */}
+            <div className="md:hidden">
+              <UserActions />
+            </div>
           </div>
 
-          {/* Search bar */}
-          <div className="flex-1 max-w-2xl mx-8">
+          {/* Search bar - full width on mobile */}
+          <div className="md:hidden">
             <form onSubmit={handleSearchSubmit} className="relative">
               <Input
                 type="text"
-                placeholder="Busque por serviços, produtos, vagas..."
+                placeholder="Buscar..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent"
+                className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent text-base"
               />
               <Button
                 type="submit"
@@ -155,8 +145,30 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
             </form>
           </div>
 
-          {/* User actions */}
-          <UserActions />
+          {/* Desktop layout */}
+          <div className="hidden md:flex items-center justify-between">
+            <div></div>
+            {/* Search bar - desktop */}
+            <div className="flex-1 max-w-2xl mx-8">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <Input
+                  type="text"
+                  placeholder="Busque por serviços, produtos, vagas..."
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-yellow hover:bg-primary-yellow/90"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+            <UserActions />
+          </div>
         </div>
 
         {/* Navigation menu */}
