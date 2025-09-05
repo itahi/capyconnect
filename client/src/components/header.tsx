@@ -109,12 +109,12 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
+      {/* Top banner - Full width */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 text-sm font-medium">
+        🚀 Marketplace completo - Serviços, Produtos, Vagas e Notícias!
+      </div>
+      
       <div className="container mx-auto px-4">
-        {/* Top banner */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 text-sm font-medium">
-          🚀 Marketplace completo - Serviços, Produtos, Vagas e Notícias!
-        </div>
-        
         {/* Main header */}
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-8">
