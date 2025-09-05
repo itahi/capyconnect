@@ -54,7 +54,7 @@ function UserActions() {
   }
 
   return (
-    <div className="flex items-center space-x-1 sm:space-x-4">
+    <div className="flex items-center space-x-2 md:space-x-4">
       <Link href="/favoritos">
         <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-red-500">
           <Heart className="h-4 w-4" />
@@ -62,16 +62,22 @@ function UserActions() {
       </Link>
 
       <Link href="/login">
-        <Button variant="outline" size="sm" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white text-xs sm:text-sm px-2 sm:px-4">
-          <span className="hidden sm:inline">Entrar</span>
-          <span className="sm:hidden">👤</span>
+        <Button variant="outline" size="sm" className="border-primary-yellow text-primary-yellow hover:bg-primary-yellow hover:text-white text-xs md:text-sm px-2 md:px-4">
+          <span className="hidden md:inline">Entrar</span>
+          <span className="md:hidden">👤</span>
+        </Button>
+      </Link>
+
+      <Link href="/cadastro">
+        <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-100 text-xs md:text-sm px-2 md:px-4 hidden md:inline-flex">
+          Cadastrar
         </Button>
       </Link>
 
       <Link href="/postar-anuncios">
-        <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium text-xs sm:text-sm px-3 py-2">
-          <span className="hidden sm:inline">Postar</span>
-          <span className="sm:hidden">+</span>
+        <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium text-xs md:text-sm px-3 py-2">
+          <span className="hidden md:inline">Postar Anúncio</span>
+          <span className="md:hidden">+</span>
         </Button>
       </Link>
     </div>
@@ -99,38 +105,69 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
       </div>
       
       <div className="container mx-auto px-4">
-        {/* Main header - Mobile optimized */}
-        <div className="flex flex-col space-y-3 py-3 md:py-4">
+        {/* Mobile layout */}
+        <div className="md:hidden flex flex-col space-y-3 py-3">
           {/* Top row: Logo + User actions */}
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
+            <Link href="/" className="flex items-center space-x-2 group">
               <img 
                 src="/attached_assets/ChatGPT Image 1 de ago. de 2025, 11_29_20_1756924509649.png" 
                 alt="Capivara Elisa" 
-                className="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
+                className="h-12 w-12 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
               />
               <div className="flex flex-col">
-                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
+                <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
                   CapyConnect
                 </h1>
-                <span className="text-xs text-purple-600 font-medium hidden sm:block">
-                  Marketplace Brasileiro
-                </span>
               </div>
             </Link>
             
-            {/* User actions - mobile optimized */}
-            <div className="md:hidden">
-              <UserActions />
-            </div>
+            <UserActions />
           </div>
 
           {/* Search bar - full width on mobile */}
-          <div className="md:hidden">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <Input
+              type="text"
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent text-base"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-yellow hover:bg-primary-yellow/90"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+
+        {/* Desktop layout */}
+        <div className="hidden md:flex items-center justify-between py-4">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <img 
+              src="/attached_assets/ChatGPT Image 1 de ago. de 2025, 11_29_20_1756924509649.png" 
+              alt="Capivara Elisa" 
+              className="h-16 w-16 object-cover rounded-full group-hover:scale-105 transition-transform duration-200"
+            />
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-purple-900 transition-all duration-200">
+                CapyConnect
+              </h1>
+              <span className="text-sm text-purple-600 font-medium">
+                Marketplace Brasileiro
+              </span>
+            </div>
+          </Link>
+          
+          {/* Search bar - desktop center */}
+          <div className="flex-1 max-w-2xl mx-8">
             <form onSubmit={handleSearchSubmit} className="relative">
               <Input
                 type="text"
-                placeholder="Buscar..."
+                placeholder="Busque por serviços, produtos, vagas e notícias..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent text-base"
@@ -144,31 +181,8 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
               </Button>
             </form>
           </div>
-
-          {/* Desktop layout */}
-          <div className="hidden md:flex items-center justify-between">
-            <div></div>
-            {/* Search bar - desktop */}
-            <div className="flex-1 max-w-2xl mx-8">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <Input
-                  type="text"
-                  placeholder="Busque por serviços, produtos, vagas..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-yellow focus:border-transparent"
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-yellow hover:bg-primary-yellow/90"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </form>
-            </div>
-            <UserActions />
-          </div>
+          
+          <UserActions />
         </div>
 
         {/* Navigation menu */}

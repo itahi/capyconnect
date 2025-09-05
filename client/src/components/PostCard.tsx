@@ -192,7 +192,7 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Image */}
         <Link href={`/post/${post.id}`} className="block">
-          <div className="aspect-video sm:aspect-[4/3] bg-gray-200 overflow-hidden">
+          <div className="aspect-[4/3] sm:aspect-[4/3] bg-gray-200 overflow-hidden">
             {post.imageUrls && post.imageUrls[0] ? (
               <img
                 src={post.imageUrls[0]}
@@ -217,7 +217,7 @@ export function PostCard({ post }: PostCardProps) {
         </Link>
       </div>
 
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-4 sm:p-4">
         {/* Category Badge */}
         <div className="flex items-center justify-between mb-3">
           <Badge variant="outline" className="text-xs">
