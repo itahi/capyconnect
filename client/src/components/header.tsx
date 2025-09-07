@@ -19,34 +19,49 @@ function UserActions() {
 
   if (isAuthenticated && user) {
     return (
-      <div className="flex items-center space-x-1 sm:space-x-4">
-        <Link href="/favoritos">
-          <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-red-500">
-            <Heart className="h-4 w-4" />
+      <div className="flex items-center space-x-2 md:space-x-4">
+        {/* Meus Anúncios */}
+        <Link href="/meus-anuncios">
+          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-purple-600 font-medium">
+            <span className="hidden md:inline">Meus Anúncios</span>
+            <span className="md:hidden text-lg">📄</span>
           </Button>
         </Link>
 
+        {/* Favoritos */}
+        <Link href="/favoritos">
+          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-red-500 font-medium">
+            <Heart className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Favoritos</span>
+          </Button>
+        </Link>
+
+        {/* Botão Admin - só para igor */}
         {user.name === 'igor' && (
           <Link href="/admin">
-            <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-purple-600">
-              <span className="text-purple-600">⚙️</span>
+            <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 font-medium">
+              <span className="text-lg md:mr-2">⚙️</span>
+              <span className="hidden md:inline">Administrador</span>
             </Button>
           </Link>
         )}
 
+        {/* Logout */}
         <Button 
           variant="ghost"
           size="sm" 
           onClick={handleLogout}
-          className="p-2 text-gray-600 hover:text-red-600"
+          className="text-gray-600 hover:text-red-600 font-medium"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Sair</span>
         </Button>
 
+        {/* Postar Anúncio */}
         <Link href="/postar-anuncios">
-          <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium text-xs sm:text-sm px-3 py-2">
-            <span className="hidden sm:inline">Postar</span>
-            <span className="sm:hidden">+</span>
+          <Button size="sm" className="bg-primary-yellow text-white hover:bg-primary-yellow/90 font-medium px-4 py-2">
+            <span className="hidden md:inline">Postar Anúncio</span>
+            <span className="md:hidden">+</span>
           </Button>
         </Link>
       </div>
