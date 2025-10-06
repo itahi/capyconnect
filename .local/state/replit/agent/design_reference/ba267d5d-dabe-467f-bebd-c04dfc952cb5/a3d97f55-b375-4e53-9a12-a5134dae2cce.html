@@ -1,0 +1,755 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromoHub - As Melhores Ofertas e Promoções do Brasil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brasil-green': '#00B447',
+                        'brasil-blue': '#0066CC',
+                        'brasil-yellow': '#FFD700',
+                        'accent-orange': '#FF6B35'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- @COMPONENT: Header [main navigation with search and user actions] -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <!-- Top banner -->
+            <div class="bg-gradient-to-r from-brasil-green to-brasil-blue text-white text-center py-2 text-sm">
+                🎉 Ofertas especiais do Dia dos Pais - Até 70% de desconto!
+            </div>
+            
+            <!-- Main header -->
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-brasil-green">PromoHub</h1>
+                        <span class="ml-2 bg-brasil-yellow text-black text-xs px-2 py-1 rounded-full font-semibold">BRASIL</span>
+                    </div>
+                </div>
+
+                <!-- Search bar -->
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input type="text" placeholder="Buscar ofertas, produtos ou lojas..." 
+                               class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-brasil-blue focus:outline-none"
+                               data-mock="true">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brasil-blue text-white px-4 py-1 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="flex items-center space-x-2 text-gray-600 hover:text-brasil-green transition-colors">
+                        <i class="fas fa-heart"></i>
+                        <span class="hidden md:block">Favoritos</span>
+                    </button>
+                    <button class="flex items-center space-x-2 text-gray-600 hover:text-brasil-green transition-colors">
+                        <i class="fas fa-bell"></i>
+                        <span class="hidden md:block">Alertas</span>
+                    </button>
+                    <button class="bg-brasil-green text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                        Entrar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation menu -->
+            <nav class="border-t border-gray-200 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-8">
+                        <button class="flex items-center space-x-2 text-gray-700 hover:text-brasil-green transition-colors">
+                            <i class="fas fa-bars"></i>
+                            <span>Todas as Categorias</span>
+                        </button>
+                        <a href="#" class="text-gray-700 hover:text-brasil-green transition-colors">Celulares</a>
+                        <a href="#" class="text-gray-700 hover:text-brasil-green transition-colors">Eletrônicos</a>
+                        <a href="#" class="text-gray-700 hover:text-brasil-green transition-colors">Casa</a>
+                        <a href="#" class="text-gray-700 hover:text-brasil-green transition-colors">Moda</a>
+                        <a href="#" class="text-gray-700 hover:text-brasil-green transition-colors">Games</a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-red-600 font-semibold">🔥 Ofertas Quentes</span>
+                        <span class="text-green-600 font-semibold">📱 App Mobile</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: HeroBanner [promotional banners and featured deals] -->
+    <section class="bg-gradient-to-r from-brasil-blue to-brasil-green text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main banner -->
+                <div class="lg:col-span-2">
+                    <!-- Featured deal rotating banner with Brazilian tech products -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 h-64 flex items-center">
+                        <div class="flex-1">
+                            <h2 class="text-3xl font-bold mb-4">Ofertas Especiais Dia dos Pais</h2>
+                            <p class="text-xl mb-4">Smartphones, Notebooks e Eletrônicos com até 70% OFF</p>
+                            <button class="bg-brasil-yellow text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">
+                                Ver Todas as Ofertas
+                            </button>
+                        </div>
+                        <div class="flex-1 text-right">
+                            <!-- Modern Brazilian e-commerce promotional image -->
+                            <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400" 
+                                 alt="Ofertas especiais de eletrônicos" 
+                                 class="rounded-lg shadow-lg w-full h-auto max-w-sm ml-auto"
+                                 data-mock="true">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats and quick actions -->
+                <div class="space-y-4">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <h3 class="font-semibold mb-2">🏆 Ofertas Verificadas</h3>
+                        <p class="text-sm opacity-90">Mais de 10.000 ofertas verificadas diariamente</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <h3 class="font-semibold mb-2">💰 Economia Total</h3>
+                        <p class="text-sm opacity-90">R$ 2.5M economizados pelos usuários este mês</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <h3 class="font-semibold mb-2">📱 App Móvel</h3>
+                        <p class="text-sm opacity-90">Alertas instantâneos no seu celular</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: HeroBanner -->
+
+    <!-- @COMPONENT: MainContent [deal listings and categories] -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar categories -->
+            <aside class="lg:w-1/4">
+                <div class="bg-white rounded-xl shadow-sm p-6 sticky top-24">
+                    <h3 class="font-bold text-lg mb-4 text-gray-800">Categorias</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-mobile-alt text-brasil-blue"></i>
+                                <span>Smartphones</span>
+                            </span>
+                            <span class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">Hot</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-laptop text-brasil-blue"></i>
+                                <span>Eletrônicos</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">1,250</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-home text-brasil-blue"></i>
+                                <span>Casa e Jardim</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">890</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-tshirt text-brasil-blue"></i>
+                                <span>Moda</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">2,100</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-gamepad text-brasil-blue"></i>
+                                <span>Games</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">450</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-heart text-brasil-blue"></i>
+                                <span>Saúde e Beleza</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">670</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-dumbbell text-brasil-blue"></i>
+                                <span>Esportes</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">320</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span class="flex items-center space-x-3">
+                                <i class="fas fa-plane text-brasil-blue"></i>
+                                <span>Viagens</span>
+                            </span>
+                            <span class="text-gray-400 text-sm">180</span>
+                        </a>
+                    </nav>
+
+                    <!-- Newsletter signup -->
+                    <div class="mt-8 p-4 bg-gradient-to-br from-brasil-green to-brasil-blue rounded-lg text-white">
+                        <h4 class="font-semibold mb-2">📧 Alertas de Ofertas</h4>
+                        <p class="text-sm mb-3 opacity-90">Receba as melhores promoções no seu email</p>
+                        <input type="email" placeholder="Seu email" 
+                               class="w-full p-2 rounded border-0 text-gray-800 text-sm mb-2"
+                               data-mock="true">
+                        <button class="w-full bg-brasil-yellow text-black py-2 rounded font-medium text-sm hover:bg-yellow-400 transition-colors">
+                            Cadastrar
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main deals content -->
+            <div class="lg:w-3/4">
+                <!-- Filter and sort bar -->
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-600 font-medium">Filtros:</span>
+                            <select class="border border-gray-300 rounded-lg px-3 py-1 text-sm" data-mock="true">
+                                <option>Todas as Lojas</option>
+                                <option>Amazon</option>
+                                <option>Magazine Luiza</option>
+                                <option>Americanas</option>
+                            </select>
+                            <select class="border border-gray-300 rounded-lg px-3 py-1 text-sm" data-mock="true">
+                                <option>Maior Desconto</option>
+                                <option>Menor Preço</option>
+                                <option>Mais Recentes</option>
+                                <option>Expira Hoje</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-gray-600 text-sm">2,847 ofertas encontradas</span>
+                            <div class="flex items-center space-x-1">
+                                <button class="p-2 border rounded-lg hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-th-large"></i>
+                                </button>
+                                <button class="p-2 border rounded-lg bg-gray-50">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hot deals section -->
+                <section class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                            🔥 Ofertas Quentes
+                            <span class="ml-3 bg-red-100 text-red-600 text-sm px-2 py-1 rounded-full">Limitadas</span>
+                        </h2>
+                        <a href="#" class="text-brasil-blue hover:underline">Ver todas</a>
+                    </div>
+
+                    <!-- @MAP: hotDeals.map(deal => ( -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Deal Card 1 -->
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-65%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- High-quality smartphone product image -->
+                            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="iPhone 14 Pro Max" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1543965170-4c01a586684e?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="Amazon logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2" data-bind="deal.title">iPhone 14 Pro Max 256GB</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green" data-bind="deal.salePrice">R$ 4.199</span>
+                                    <span class="text-gray-500 line-through" data-bind="deal.originalPrice">R$ 11.999</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 2h 15m</span>
+                                    <span>👥 127 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deal Card 2 -->
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-45%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- Modern gaming laptop image -->
+                            <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Notebook Gamer Dell" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="Dell logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Notebook Gamer Dell G15 RTX 3060</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green">R$ 3.299</span>
+                                    <span class="text-gray-500 line-through">R$ 5.999</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 1 dia</span>
+                                    <span>👥 89 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deal Card 3 -->
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-55%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- Modern air fryer appliance image -->
+                            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Air Fryer Philips Walita" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="Philips logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Air Fryer Philips Walita 4.1L</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green">R$ 299</span>
+                                    <span class="text-gray-500 line-through">R$ 669</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 6h</span>
+                                    <span>👥 234 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </section>
+
+                <!-- Coupon codes section -->
+                <section class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                            🎫 Cupons de Desconto
+                            <span class="ml-3 bg-brasil-yellow text-black text-sm px-2 py-1 rounded-full">Novos</span>
+                        </h2>
+                        <a href="#" class="text-brasil-blue hover:underline">Ver todos</a>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Coupon Card 1 -->
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 text-white relative overflow-hidden">
+                            <div class="absolute top-2 right-2">
+                                <span class="bg-white/20 text-white text-xs px-2 py-1 rounded-full">Magazine Luiza</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-xl mb-2">15% OFF</h3>
+                                    <p class="text-sm opacity-90 mb-3">Em compras acima de R$ 299</p>
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 inline-block">
+                                        <span class="font-mono font-bold" data-bind="coupon.code">MAGALU15</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm opacity-75">Expira em</p>
+                                    <p class="font-semibold">2 dias</p>
+                                    <button class="mt-3 bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm">
+                                        Copiar Código
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coupon Card 2 -->
+                        <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-6 text-white relative overflow-hidden">
+                            <div class="absolute top-2 right-2">
+                                <span class="bg-white/20 text-white text-xs px-2 py-1 rounded-full">Amazon</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-xl mb-2">R$ 50 OFF</h3>
+                                    <p class="text-sm opacity-90 mb-3">Primeira compra no app</p>
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 inline-block">
+                                        <span class="font-mono font-bold">PRIMEIRACOMPRA</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm opacity-75">Expira em</p>
+                                    <p class="font-semibold">7 dias</p>
+                                    <button class="mt-3 bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm">
+                                        Copiar Código
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Regular deals grid -->
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Todas as Ofertas</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- More deal cards would be generated here -->
+                        <!-- @MAP: regularDeals.map(deal => ( -->
+                        
+                        <!-- Deal Card -->
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-35%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- Stylish running shoes product image -->
+                            <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Tênis Nike Air Max" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="Nike logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Tênis Nike Air Max 270</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green">R$ 389</span>
+                                    <span class="text-gray-500 line-through">R$ 599</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 3 dias</span>
+                                    <span>👥 45 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-25%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- Gaming headset product image -->
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Headset Gamer HyperX" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="HyperX logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Headset Gamer HyperX Cloud II</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green">R$ 299</span>
+                                    <span class="text-gray-500 line-through">R$ 399</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 5 dias</span>
+                                    <span>👥 67 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 relative overflow-hidden">
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">-40%</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-10">
+                                <button class="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                                </button>
+                            </div>
+                            <!-- Modern smart TV image -->
+                            <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Smart TV Samsung 55 4K" 
+                                 class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=30" 
+                                         alt="Samsung logo" 
+                                         class="h-4 w-auto"
+                                         data-mock="true">
+                                    <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Verificado</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Smart TV Samsung 55" 4K Crystal UHD</h3>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-2xl font-bold text-brasil-green">R$ 1.899</span>
+                                    <span class="text-gray-500 line-through">R$ 3.199</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                    <span>⏰ Expira em 4 dias</span>
+                                    <span>👥 156 usaram</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="flex-1 bg-brasil-green text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                                        Ver Oferta
+                                    </button>
+                                    <button class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-share-alt text-gray-600"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+
+                    <!-- Load more button -->
+                    <div class="text-center mt-8">
+                        <button class="bg-white border-2 border-brasil-green text-brasil-green px-8 py-3 rounded-lg font-medium hover:bg-brasil-green hover:text-white transition-colors">
+                            Carregar Mais Ofertas
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <!-- @END_COMPONENT: MainContent -->
+
+    <!-- @COMPONENT: Footer [site links and information] -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Company info -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-brasil-green">PromoHub</h3>
+                    <p class="text-gray-300 mb-4">A maior plataforma de ofertas e promoções do Brasil. Economia garantida em milhares de produtos.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-brasil-green transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-brasil-green transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-brasil-green transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-brasil-green transition-colors">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Links Rápidos</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Como Funciona</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Enviar Oferta</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Programa de Afiliados</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">API Desenvolvedores</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-semibold mb-4">Categorias Populares</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Smartphones</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Eletrônicos</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Moda</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Casa e Jardim</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h4 class="font-semibold mb-4">Suporte</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Central de Ajuda</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Contato</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Política de Privacidade</a></li>
+                        <li><a href="#" class="hover:text-brasil-green transition-colors">Termos de Uso</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm">© 2024 PromoHub. Todos os direitos reservados.</p>
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        <span class="text-gray-400 text-sm">Baixe nosso app:</span>
+                        <a href="#" class="hover:opacity-80 transition-opacity">
+                            <!-- App Store button image -->
+                            <img src="https://pixabay.com/get/g4d450ab4f548e500c8a817bbe932f00dbaba19d248679bdd9ea3ca3f3a387808fa29e51fa90677aa0f0bb715303186d7de51bbc1240d194c244bf3406ce2051c_1280.jpg" 
+                                 alt="Download na App Store" 
+                                 class="h-10 w-auto"
+                                 data-mock="true">
+                        </a>
+                        <a href="#" class="hover:opacity-80 transition-opacity">
+                            <!-- Google Play button image -->
+                            <img src="https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&h=40" 
+                                 alt="Baixar no Google Play" 
+                                 class="h-10 w-auto"
+                                 data-mock="true">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <!-- @STATE: searchQuery:string = '' -->
+    <!-- @STATE: selectedCategory:string = 'all' -->
+    <!-- @STATE: favoriteDeals:array = [] -->
+    <!-- @STATE: isLoading:boolean = false -->
+
+    <script>
+        // TODO: Implement deal search functionality
+        // TODO: Implement price tracking and alerts
+        // TODO: Implement user authentication and favorites
+        // TODO: Implement deal verification system
+        // TODO: Implement coupon code validation
+        // TODO: Implement newsletter subscription
+        
+        (function() {
+            // Mobile menu toggle functionality
+            const menuButton = document.querySelector('[data-mobile-menu]');
+            if (menuButton) {
+                menuButton.addEventListener('click', function() {
+                    // TODO: Toggle mobile navigation menu
+                });
+            }
+
+            // Heart/favorite button functionality
+            const favoriteButtons = document.querySelectorAll('.fa-heart');
+            favoriteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // TODO: Toggle favorite status and update UI
+                    this.classList.toggle('text-red-500');
+                    this.classList.toggle('text-gray-400');
+                });
+            });
+
+            // Copy coupon code functionality
+            const copyButtons = document.querySelectorAll('button:contains("Copiar Código")');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // TODO: Copy coupon code to clipboard
+                    // TODO: Show success message
+                });
+            });
+
+            // Deal card hover effects
+            const dealCards = document.querySelectorAll('.bg-white.rounded-xl');
+            dealCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Newsletter subscription
+            const newsletterForm = document.querySelector('input[type="email"]');
+            if (newsletterForm) {
+                const submitButton = newsletterForm.nextElementSibling;
+                submitButton.addEventListener('click', function() {
+                    // TODO: Validate email and submit subscription
+                    // TODO: Show success/error message
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
